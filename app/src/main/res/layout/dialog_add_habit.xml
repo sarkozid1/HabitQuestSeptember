@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:animation="@anim/fade_in">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/dialog_scroll_bg"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="📜 Új küldetés"
+            android:textColor="#4A2F17"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="14dp"
+            android:background="#8B5A2B" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Küldetés neve"
+            android:textColor="#4A2F17"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/habitNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/input_fantasy_bg"
+            android:hint="pl. Reggeli edzés"
+            android:textColorHint="#8B6F47"
+            android:textColor="#3A2C1A"
+            android:inputType="text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Leírás"
+            android:textColor="#4A2F17"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/habitDescInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/input_fantasy_bg"
+            android:hint="Mit kell tenned a küldetéshez?"
+            android:textColorHint="#8B6F47"
+            android:textColor="#3A2C1A"
+            android:inputType="text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="XP jutalom"
+            android:textColor="#4A2F17"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/habitXpInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/input_fantasy_bg"
+            android:hint="10"
+            android:textColorHint="#8B6F47"
+            android:textColor="#3A2C1A"
+            android:inputType="number" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="10dp"
+            android:background="#C9A56A" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🏆 Jutalom feloldása (opcionális)"
+            android:textColor="#6B4A22"
+            android:textSize="13sp"
+            android:textStyle="italic" />
+
+        <EditText
+            android:id="@+id/achNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/input_fantasy_bg"
+            android:hint="Jutalom címe"
+            android:textColorHint="#8B6F47"
+            android:textColor="#3A2C1A"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/achDescInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/input_fantasy_bg"
+            android:hint="Jutalom leírása"
+            android:textColorHint="#8B6F47"
+            android:textColor="#3A2C1A"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/achTargetInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/input_fantasy_bg"
+            android:hint="Hányszor kell teljesíteni?"
+            android:textColorHint="#8B6F47"
+            android:textColor="#3A2C1A"
+            android:inputType="number" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/button_pill_secondary"
+                android:backgroundTint="@null"
+                android:stateListAnimator="@null"
+                android:text="Mégse"
+                android:textColor="@color/ink_secondary"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/confirmButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_pill_oncard"
+                android:backgroundTint="@null"
+                android:stateListAnimator="@null"
+                android:text="Hozzáadás"
+                android:textColor="@color/ink_primary"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

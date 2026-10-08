@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">HabitQuest</string>
+    <string name="karakter_ikon">Karakter ikon</string>
+    <string name="t_rk_p">Térkép</string>
+</resources>

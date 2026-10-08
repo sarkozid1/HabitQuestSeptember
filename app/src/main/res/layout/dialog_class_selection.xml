@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/classDialogRoot"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_width="320dp"
+        android:layout_height="640dp"
+        android:layout_gravity="center"
+        android:padding="24dp"
+        android:animation="@anim/fade_in">
+
+        <!-- Harcos kártya -->
+        <LinearLayout
+            android:id="@+id/classWarrior"
+            android:layout_width="match_parent"
+            android:layout_height="153dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/card_button_selector"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <ImageView
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:contentDescription="Harcos"
+                android:src="@drawable/lv8" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Harcos ️"
+                    android:textColor="@color/ink_primary"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Erős, bátor, fizikai sebzést növel"
+                    android:textColor="@color/ink_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Mágus kártya -->
+        <LinearLayout
+            android:id="@+id/classMage"
+            android:layout_width="match_parent"
+            android:layout_height="153dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/card_button_selector"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <ImageView
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:contentDescription="Mágus"
+                android:src="@drawable/mage_lv4" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mágus"
+                    android:textColor="@color/ink_primary"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Okos, mágikus, XP-t gyorsabban gyűjt"
+                    android:textColor="@color/ink_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Tolvaj kártya -->
+        <LinearLayout
+            android:id="@+id/classRogue"
+            android:layout_width="match_parent"
+            android:layout_height="153dp"
+            android:background="@drawable/card_button_selector"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <ImageView
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:contentDescription="Tolvaj"
+                android:src="@drawable/rogue_lv4" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tolvaj"
+                    android:textColor="@color/ink_primary"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gyors, ravasz, extra érmét szerez"
+                    android:textColor="@color/ink_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>

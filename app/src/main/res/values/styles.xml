@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 🌙 Alap app téma – sötét fantasy hangulat -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Fő színek -->
+        <item name="colorPrimary">#3F0071</item>          <!-- mély lila -->
+        <item name="colorPrimaryDark">#240046</item>      <!-- sötétlila -->
+        <item name="colorAccent">#FFD700</item>           <!-- arany -->
+        <!-- Szövegszínek és háttér -->
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:windowBackground">#1E1E1E</item>
+
+    </style>
+
+    <!-- ✨ Dialógus animáció (beúszás) -->
+    <style name="DialogFadeAnimation">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_in</item>
+    </style>
+
+
+
+    <!-- 💫 Gombstílus (pl. "Új szokás" gomb) -->
+    <style name="RpgButton" parent="Widget.AppCompat.Button">
+        <item name="android:backgroundTint">#3F0071</item>
+        <item name="android:textColor">#FFD700</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>

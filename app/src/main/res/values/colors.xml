@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- ===== Fantasy × Apple design tokens ===== -->
+
+    <!-- Tinta (szöveg) -->
+    <color name="ink_primary">#3A2C1A</color>
+    <color name="ink_secondary">#7A6748</color>
+    <color name="ink_on_dark">#F3E4C1</color>
+    <color name="ink_on_dark_secondary">#C9B88A</color>
+
+    <!-- Arany kiemelés -->
+    <color name="gold_accent">#C9A227</color>
+    <color name="gold_bright">#FFD700</color>
+
+    <!-- Üveg / pergamen felületek (áttetsző "material" réteg) -->
+    <color name="glass_parchment">#E8F3E4C1</color>
+    <color name="glass_parchment_light">#D9FFF8E7</color>
+    <color name="glass_parchment_dark">#E8D6C9AA</color>
+    <color name="glass_border">#668B5A2B</color>
+    <color name="glass_border_strong">#8B5A2B</color>
+</resources>

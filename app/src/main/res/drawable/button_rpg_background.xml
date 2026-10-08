@@ -1,0 +1,25 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Lenyomott állapot -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#9A7B4F"
+                android:endColor="#6E4E28"
+                android:angle="270" />
+            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="#4D3A1F" />
+        </shape>
+    </item>
+
+    <!-- Normál állapot -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#E0B97D"
+                android:endColor="#C88B4E"
+                android:angle="270" />
+            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="#4D3A1F" />
+        </shape>
+    </item>
+</selector>

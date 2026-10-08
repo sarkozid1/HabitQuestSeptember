@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_habits"
+        android:icon="@drawable/quest"
+        android:title="Szokások" />
+
+    <item
+        android:id="@+id/nav_map"
+        android:icon="@drawable/map"
+        android:title="Térkép" />
+
+
+    <item
+        android:id="@+id/nav_shop"
+        android:icon="@drawable/outfit_knight"
+        android:title="Bolt" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/rpg_game"
+        android:title="Profil" />
+
+</menu>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@android:color/transparent"
+    android:fitsSystemWindows="true">
+
+    <!-- Karakter fejléc kártya -->
+    <LinearLayout
+        android:id="@+id/habitHeaderCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@drawable/glass_card_bg"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Avatar -->
+        <ImageView
+            android:id="@+id/characterImage"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:contentDescription="Karakter kép"
+            android:src="@drawable/lv1" />
+
+        <!-- Szint neve -->
+        <TextView
+            android:id="@+id/levelName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="serif"
+            android:text="Tanonc"
+            android:textColor="@color/gold_accent"
+            android:textSize="17sp"
+            android:textStyle="italic" />
+
+        <ProgressBar
+            android:id="@+id/xpProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="14dp"
+            android:layout_marginTop="10dp"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/xp_progress_bar" />
+
+        <!-- Szint / XP -->
+        <TextView
+            android:id="@+id/characterStats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Szint: 1 | XP: 0"
+            android:textColor="@color/ink_secondary"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- RecyclerView csak ez görgethető -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/habitRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="16dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/habitHeaderCard"
+        app:layout_constraintBottom_toTopOf="@id/addHabitButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Szokás hozzáadás gomb -->
+    <Button
+        android:id="@+id/addHabitButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button_pill_primary"
+        android:backgroundTint="@null"
+        android:stateListAnimator="@null"
+        android:paddingVertical="12dp"
+        android:text="✚ Új küldetés"
+        android:textColor="@color/ink_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

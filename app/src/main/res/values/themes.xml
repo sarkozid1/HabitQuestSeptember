@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme – fantasy arany/pergamen paletta a Material3 alapértelmezett lila helyett -->
+    <style name="Base.Theme.HabitQuest" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/gold_accent</item>
+        <item name="colorOnPrimary">@color/ink_primary</item>
+        <item name="colorPrimaryContainer">@color/glass_parchment</item>
+        <item name="colorOnPrimaryContainer">@color/ink_primary</item>
+        <item name="colorSecondary">@color/gold_bright</item>
+        <item name="colorOnSecondary">@color/ink_primary</item>
+        <item name="colorSurface">@color/glass_parchment</item>
+        <item name="colorOnSurface">@color/ink_primary</item>
+        <item name="colorOutline">@color/glass_border_strong</item>
+    </style>
+
+    <style name="Theme.HabitQuest" parent="Base.Theme.HabitQuest" />
+</resources>

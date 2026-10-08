@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Útvonal és checkpointok -->
+    <com.example.habitquest.view.MapPathView
+        android:id="@+id/mapPathView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp" />
+
+    <!-- Karakter ikon (az ösvény mentén mozog) -->
+    <ImageView
+        android:id="@+id/characterIcon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:contentDescription="@string/karakter_ikon"
+        android:src="@drawable/lv2" />
+
+    <!-- Zóna fejléc kártya -->
+    <LinearLayout
+        android:id="@+id/mapHeaderCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@drawable/glass_card_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="18dp"
+        android:paddingVertical="14dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mapZoneName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="serif"
+                android:text="Vidék"
+                android:textColor="@color/ink_primary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mapZoneRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Szint 1–5"
+                android:textColor="@color/ink_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/mapProgressChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/glass_chip_bg"
+            android:text="🚩 1 / 5"
+            android:textColor="@color/ink_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</FrameLayout>
