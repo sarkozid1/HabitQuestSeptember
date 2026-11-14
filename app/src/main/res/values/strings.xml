@@ -2,4 +2,91 @@
     <string name="app_name">HabitQuest</string>
     <string name="karakter_ikon">Karakter ikon</string>
     <string name="t_rk_p">Térkép</string>
+
+    <!-- Általános -->
+    <string name="action_cancel">Mégse</string>
+    <string name="action_save">Mentés</string>
+    <string name="action_add">Hozzáadás</string>
+    <string name="action_edit">Szerkesztés</string>
+    <string name="action_delete">Törlés</string>
+
+    <!-- Szokás dialógusok -->
+    <string name="habit_add_title">📜 Új küldetés</string>
+    <string name="habit_edit_title">✏️ Küldetés szerkesztése</string>
+    <string name="habit_name_label">Küldetés neve</string>
+    <string name="habit_name_hint">pl. Reggeli edzés</string>
+    <string name="habit_desc_label">Leírás</string>
+    <string name="habit_desc_hint">Mit kell tenned a küldetéshez?</string>
+    <string name="habit_xp_label">XP jutalom</string>
+    <string name="habit_xp_hint">10</string>
+    <string name="habit_ach_section">🏆 Jutalom feloldása (opcionális)</string>
+    <string name="habit_ach_name_hint">Jutalom címe</string>
+    <string name="habit_ach_desc_hint">Jutalom leírása</string>
+    <string name="habit_ach_target_hint">Hányszor kell teljesíteni?</string>
+    <string name="habit_ach_default_desc">Új achievement</string>
+    <string name="habit_delete_title">Szokás törlése</string>
+    <string name="habit_delete_message">Biztosan törlöd: „%1$s”?</string>
+
+    <!-- Ütemezés -->
+    <string name="schedule_label">🗓️ Ütemezés</string>
+    <string name="schedule_daily">Minden nap</string>
+    <string name="schedule_weekdays">A hét bizonyos napjain</string>
+    <string name="schedule_times_per_week">Heti néhány alkalom</string>
+    <string name="schedule_times_per_week_hint">Hányszor egy héten? (1–7)</string>
+    <string name="schedule_error_no_days">Válassz ki legalább egy napot!</string>
+    <string name="schedule_error_times">Heti 1 és 7 közötti alkalmat adj meg!</string>
+    <string name="day_short_mon">H</string>
+    <string name="day_short_tue">K</string>
+    <string name="day_short_wed">Sze</string>
+    <string name="day_short_thu">Cs</string>
+    <string name="day_short_fri">P</string>
+    <string name="day_short_sat">Szo</string>
+    <string name="day_short_sun">V</string>
+    <string name="schedule_summary_daily">Minden nap</string>
+    <string name="schedule_summary_times">Heti %1$d× · ezen a héten %2$d/%1$d</string>
+    <string name="habit_not_due_today">Ma nem esedékes</string>
+    <string name="habit_done_today">✔ Ma teljesítve</string>
+    <string name="streak_days">🔥 %1$d napos sorozat</string>
+    <string name="streak_times">🔥 %1$d alkalmas sorozat</string>
+
+    <!-- Emlékeztető -->
+    <string name="reminder_label">⏰ Emlékeztető</string>
+    <string name="reminder_summary">⏰ %1$s</string>
+
+    <!-- Értesítések -->
+    <string name="notif_channel_water">Vízivás emlékeztető</string>
+    <string name="notif_channel_habits">Szokás emlékeztetők</string>
+    <string name="notif_water_title">Igyál egy kis vizet 💧</string>
+    <string name="notif_water_text">Eltelt fél óra!</string>
+    <string name="notif_habit_title">📜 %1$s</string>
+    <string name="notif_habit_text">A mai küldetésed még vár rád!</string>
+
+    <!-- Profil -->
+    <string name="profile_level">Szint: %1$d</string>
+    <string name="profile_xp">XP: %1$d / %2$d</string>
+
+    <!-- Profil: Beállítások / Adatok -->
+    <string name="settings_title">⚙️ Beállítások / Adatok</string>
+    <string name="settings_water_reminder">💧 Vízivás-emlékeztető (30 percenként)</string>
+    <string name="backup_description">Telefonváltás előtt mentsd el az adataidat egy fájlba (pl. Google Drive-ra), az új telefonon pedig töltsd vissza.</string>
+    <string name="backup_export">📤 Exportálás</string>
+    <string name="backup_import">📥 Importálás</string>
+    <string name="backup_export_success">Mentés kész ✔</string>
+    <string name="backup_export_failed">Nem sikerült elmenteni a fájlt. Próbáld újra, vagy válassz másik helyet.</string>
+    <string name="backup_import_confirm_title">Adatok visszaállítása</string>
+    <string name="backup_import_confirm_message">Ez felülírja a jelenlegi adataidat!\n\nA mentésben: %1$d. szintű karakter, %2$d szokás, %3$d eredmény.\n\nFolytatod?</string>
+    <string name="backup_import_confirm_ok">Visszaállítás</string>
+    <string name="backup_import_success">Adatok visszaállítva ✔</string>
+    <string name="backup_import_error_title">Nem sikerült a visszaállítás</string>
+    <string name="backup_error_not_json">Ez a fájl nem olvasható HabitQuest-mentésként. Biztosan a HabitQuest által exportált .json fájlt választottad?</string>
+    <string name="backup_error_not_habitquest">Ez a fájl nem HabitQuest-mentés.</string>
+    <string name="backup_error_newer_version">Ezt a mentést az app egy újabb verziója készítette. Frissítsd az alkalmazást, és próbáld újra.</string>
+    <string name="backup_error_invalid_data">A mentés hiányos vagy sérült, ezért nem töltöttük be. A jelenlegi adataid nem változtak.</string>
+    <string name="action_ok">Rendben</string>
+
+    <!-- Szokás képernyő fejléc -->
+    <string name="habit_header_stats">Szint: %1$d | XP: %2$d</string>
+    <string name="level_title_novice">Tanonc</string>
+    <string name="level_title_warrior">Harcos</string>
+    <string name="level_title_master">Mester</string>
 </resources>

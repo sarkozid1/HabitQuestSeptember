@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="📜 Új küldetés"
+            android:text="@string/habit_add_title"
             android:textColor="#4A2F17"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Küldetés neve"
+            android:text="@string/habit_name_label"
             android:textColor="#4A2F17"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:background="@drawable/input_fantasy_bg"
-            android:hint="pl. Reggeli edzés"
+            android:hint="@string/habit_name_hint"
             android:textColorHint="#8B6F47"
             android:textColor="#3A2C1A"
             android:inputType="text" />
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Leírás"
+            android:text="@string/habit_desc_label"
             android:textColor="#4A2F17"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:background="@drawable/input_fantasy_bg"
-            android:hint="Mit kell tenned a küldetéshez?"
+            android:hint="@string/habit_desc_hint"
             android:textColorHint="#8B6F47"
             android:textColor="#3A2C1A"
             android:inputType="text" />
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="XP jutalom"
+            android:text="@string/habit_xp_label"
             android:textColor="#4A2F17"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -82,10 +82,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:background="@drawable/input_fantasy_bg"
-            android:hint="10"
+            android:hint="@string/habit_xp_hint"
             android:textColorHint="#8B6F47"
             android:textColor="#3A2C1A"
             android:inputType="number" />
+
+        <include
+            android:id="@+id/schedulePicker"
+            layout="@layout/view_schedule_picker" />
 
         <View
             android:layout_width="match_parent"
@@ -97,7 +101,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🏆 Jutalom feloldása (opcionális)"
+            android:text="@string/habit_ach_section"
             android:textColor="#6B4A22"
             android:textSize="13sp"
             android:textStyle="italic" />
@@ -108,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@drawable/input_fantasy_bg"
-            android:hint="Jutalom címe"
+            android:hint="@string/habit_ach_name_hint"
             android:textColorHint="#8B6F47"
             android:textColor="#3A2C1A"
             android:inputType="text" />
@@ -119,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@drawable/input_fantasy_bg"
-            android:hint="Jutalom leírása"
+            android:hint="@string/habit_ach_desc_hint"
             android:textColorHint="#8B6F47"
             android:textColor="#3A2C1A"
             android:inputType="text" />
@@ -130,7 +134,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@drawable/input_fantasy_bg"
-            android:hint="Hányszor kell teljesíteni?"
+            android:hint="@string/habit_ach_target_hint"
             android:textColorHint="#8B6F47"
             android:textColor="#3A2C1A"
             android:inputType="number" />
@@ -150,7 +154,7 @@
                 android:background="@drawable/button_pill_secondary"
                 android:backgroundTint="@null"
                 android:stateListAnimator="@null"
-                android:text="Mégse"
+                android:text="@string/action_cancel"
                 android:textColor="@color/ink_secondary"
                 android:textStyle="bold" />
 
@@ -162,7 +166,7 @@
                 android:background="@drawable/button_pill_oncard"
                 android:backgroundTint="@null"
                 android:stateListAnimator="@null"
-                android:text="Hozzáadás"
+                android:text="@string/action_add"
                 android:textColor="@color/ink_primary"
                 android:textStyle="bold" />
 

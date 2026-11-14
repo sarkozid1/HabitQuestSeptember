@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:animation="@anim/fade_in">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/dialog_scroll_bg"
-    android:padding="20dp"
-    android:animation="@anim/fade_in">
+    android:padding="20dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="✏️ Küldetés szerkesztése"
+        android:text="@string/habit_edit_title"
         android:textColor="#4A2F17"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -27,7 +31,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Küldetés neve"
+        android:text="@string/habit_name_label"
         android:textColor="#4A2F17"
         android:textSize="13sp"
         android:textStyle="bold" />
@@ -46,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Leírás"
+        android:text="@string/habit_desc_label"
         android:textColor="#4A2F17"
         android:textSize="13sp"
         android:textStyle="bold" />
@@ -65,7 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="XP jutalom"
+        android:text="@string/habit_xp_label"
         android:textColor="#4A2F17"
         android:textSize="13sp"
         android:textStyle="bold" />
@@ -79,6 +83,10 @@
         android:textColorHint="#8B6F47"
         android:textColor="#3A2C1A"
         android:inputType="number" />
+
+    <include
+        android:id="@+id/schedulePicker"
+        layout="@layout/view_schedule_picker" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -95,7 +103,7 @@
             android:background="@drawable/button_pill_secondary"
             android:backgroundTint="@null"
             android:stateListAnimator="@null"
-            android:text="Mégse"
+            android:text="@string/action_cancel"
             android:textColor="@color/ink_secondary"
             android:textStyle="bold" />
 
@@ -107,10 +115,12 @@
             android:background="@drawable/button_pill_oncard"
             android:backgroundTint="@null"
             android:stateListAnimator="@null"
-            android:text="Mentés"
+            android:text="@string/action_save"
             android:textColor="@color/ink_primary"
             android:textStyle="bold" />
 
     </LinearLayout>
 
 </LinearLayout>
+
+</ScrollView>

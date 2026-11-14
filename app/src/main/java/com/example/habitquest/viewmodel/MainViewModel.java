@@ -9,11 +9,21 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.habitquest.model.Achievement;
 import com.example.habitquest.model.Habit;
+import com.example.habitquest.model.Schedule;
 import com.example.habitquest.model.ShopItem;
 import com.example.habitquest.model.UserCharacter;
 import com.example.habitquest.model.WorldZone;
+import com.example.habitquest.notifications.ReminderScheduler;
+import com.example.habitquest.notifications.WorkManagerReminderScheduler;
+import com.example.habitquest.utils.BackupManager;
 import com.example.habitquest.utils.StorageHelper;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +41,8 @@ public class MainViewModel extends ViewModel {
     // LiveData objektumok
     private final MutableLiveData<UserCharacter> character = new MutableLiveData<>(new UserCharacter());
     private final MutableLiveData<List<Habit>> habits = new MutableLiveData<>(new ArrayList<>());
+    /** A szokáslista a mai napra kiszámolt állapottal, rendezve (esedékesek elöl). */
+    private final MutableLiveData<List<HabitListItem>> habitItems = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Achievement>> achievements = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<WorldZone> currentZone = new MutableLiveData<>();
     private final MutableLiveData<List<ShopItem>> shopItems = new MutableLiveData<>(buildShopCatalog());
@@ -50,6 +62,7 @@ public class MainViewModel extends ViewModel {
     // GETTEREK
     public LiveData<UserCharacter> getCharacter() { return character; }
     public LiveData<List<Habit>> getHabits() { return habits; }
+    public LiveData<List<HabitListItem>> getHabitItems() { return habitItems; }
     public LiveData<List<Achievement>> getAchievements() { return achievements; }
     public LiveData<WorldZone> getCurrentZone() { return currentZone; }
     public LiveData<List<ShopItem>> getShopItems() { return shopItems; }
@@ -57,6 +70,70 @@ public class MainViewModel extends ViewModel {
 
     public void setLastDiscoveredZone(String zoneName) { lastDiscoveredZone.setValue(zoneName); }
     public boolean isStorageInitialized() { return storageInitialized; }
+
+    // -------------------------
+    // Emlékeztetők (tesztekben NO_OP vagy fake)
+    // -------------------------
+    private ReminderScheduler reminderScheduler = ReminderScheduler.NO_OP;
+    private final MutableLiveData<Boolean> waterReminderEnabled = new MutableLiveData<>(true);
+
+    public void setReminderScheduler(ReminderScheduler scheduler) {
+        this.reminderScheduler = scheduler != null ? scheduler : ReminderScheduler.NO_OP;
+    }
+
+    public LiveData<Boolean> getWaterReminderEnabled() { return waterReminderEnabled; }
+
+    public void setWaterReminderEnabled(boolean enabled) {
+        waterReminderEnabled.setValue(enabled);
+        if (storage != null) storage.setWaterReminderEnabled(enabled);
+        reminderScheduler.setWaterReminderEnabled(enabled);
+    }
+
+    // -------------------------
+    // Óra (tesztekben beinjektálható)
+    // -------------------------
+    private Clock clock = Clock.systemDefaultZone();
+
+    public void setClock(Clock clock) {
+        this.clock = clock != null ? clock : Clock.systemDefaultZone();
+        refreshHabitItems();
+    }
+
+    private LocalDate today() { return LocalDate.now(clock); }
+
+    /** A szokáslista frissítése (pl. napváltás után, amikor a Fragment újra előtérbe kerül). */
+    public void refreshHabitItems() {
+        habitItems.setValue(buildHabitItems(habits.getValue(), today()));
+    }
+
+    /** A szokások beállítása + a megjelenítési lista újraszámolása. */
+    private void publishHabits(List<Habit> habitList) {
+        habits.setValue(habitList);
+        habitItems.setValue(buildHabitItems(habitList, today()));
+    }
+
+    /**
+     * Megjelenítési lista: a ma esedékes szokások elöl, a nem esedékesek a végén
+     * (az eredeti sorrend csoporton belül megmarad).
+     */
+    static List<HabitListItem> buildHabitItems(List<Habit> habitList, LocalDate today) {
+        List<HabitListItem> due = new ArrayList<>();
+        List<HabitListItem> notDue = new ArrayList<>();
+        if (habitList != null) {
+            for (Habit h : habitList) {
+                HabitListItem item = new HabitListItem(
+                        h,
+                        h.isDueOn(today),
+                        h.isCompletedOn(today),
+                        h.getCompletionsOn(today),
+                        h.getEffectiveStreak(today),
+                        h.getCompletionDaysInWeekOf(today));
+                (item.isDueToday() ? due : notDue).add(item);
+            }
+        }
+        due.addAll(notDue);
+        return due;
+    }
 
     // -------------------------
     // Persist helper metódusok
@@ -70,7 +147,7 @@ public class MainViewModel extends ViewModel {
     private void persistAll(UserCharacter user, List<Habit> habitList) {
         publishStatsFromCharacter(user);
         character.setValue(user);
-        habits.setValue(habitList);
+        publishHabits(habitList);
 
         if (storage != null) {
             storage.saveCharacter(user);
@@ -187,12 +264,22 @@ public class MainViewModel extends ViewModel {
     // -------------------------
     // Habit logika
     // -------------------------
-    public void completeHabit(int index) {
+    /** Szokás keresése stabil id alapján (null, ha nincs ilyen). */
+    public Habit findHabitById(String id) {
         List<Habit> habitList = habits.getValue();
-        if (habitList == null || habitList.isEmpty() || index < 0 || index >= habitList.size()) return;
+        if (habitList == null || id == null) return null;
+        for (Habit h : habitList) {
+            if (id.equals(h.getId())) return h;
+        }
+        return null;
+    }
 
-        Habit habit = habitList.get(index);
-        habit.complete();
+    public void completeHabit(String habitId) {
+        List<Habit> habitList = habits.getValue();
+        Habit habit = findHabitById(habitId);
+        if (habitList == null || habit == null) return;
+
+        habit.complete(today());
 
         UserCharacter user = character.getValue();
         if (user == null) return;
@@ -215,6 +302,8 @@ public class MainViewModel extends ViewModel {
 
         publishStatsFromCharacter(user);
         persistAll(user, habitList);
+        // ha ma már teljesítve van, a mai emlékeztető kimarad → a következő esedékes napra ugrik
+        reminderScheduler.schedule(habit);
 
     }
 
@@ -222,29 +311,47 @@ public class MainViewModel extends ViewModel {
         List<Habit> habitList = habits.getValue();
         if (habitList == null) habitList = new ArrayList<>();
         habitList.add(habit);
-        habits.setValue(habitList);
+        publishHabits(habitList);
         if (storage != null) storage.saveHabits(habitList);
+        reminderScheduler.schedule(habit);
     }
 
-    public void updateHabit(int index, String name, String description, int experienceReward) {
-        List<Habit> habitList = habits.getValue();
-        if (habitList == null || index < 0 || index >= habitList.size()) return;
+    public void updateHabit(String habitId, String name, String description, int experienceReward) {
+        Habit habit = findHabitById(habitId);
+        if (habit == null) return;
+        updateHabit(habitId, name, description, experienceReward, habit.getSchedule(),
+                habit.getReminderMinutes());
+    }
 
-        Habit habit = habitList.get(index);
+    /**
+     * Szokás módosítása ütemezéssel és emlékeztetővel együtt.
+     * @param reminderMinutes emlékeztető (éjfél óta eltelt perc), null = nincs
+     */
+    public void updateHabit(String habitId, String name, String description, int experienceReward,
+                            Schedule schedule, Integer reminderMinutes) {
+        List<Habit> habitList = habits.getValue();
+        Habit habit = findHabitById(habitId);
+        if (habitList == null || habit == null) return;
+
         habit.setName(name);
         habit.setDescription(description);
         habit.setExperienceReward(experienceReward);
+        habit.setSchedule(schedule);
+        habit.setReminderMinutes(reminderMinutes);
 
-        habits.setValue(habitList);
+        publishHabits(habitList);
         if (storage != null) storage.saveHabits(habitList);
+        reminderScheduler.schedule(habit); // frissíti vagy törli az emlékeztetőt
     }
 
-    public void deleteHabit(int index) {
+    public void deleteHabit(String habitId) {
         List<Habit> habitList = habits.getValue();
-        if (habitList == null || index < 0 || index >= habitList.size()) return;
+        Habit habit = findHabitById(habitId);
+        if (habitList == null || habit == null) return;
 
-        habitList.remove(index);
-        habits.setValue(habitList);
+        habitList.remove(habit);
+        reminderScheduler.cancel(habitId);
+        publishHabits(habitList);
         if (storage != null) storage.saveHabits(habitList);
     }
 
@@ -254,7 +361,7 @@ public class MainViewModel extends ViewModel {
         initialHabits.add(new Habit("10 perc séta", "Sétálj egyet a szabadban", 15));
         initialHabits.add(new Habit("Tanulás 30 perc", "Tanulj fókuszáltan legalább 30 percet", 25));
         initialHabits.add(new Habit("Teszt", "sok XP", 1125));
-        habits.setValue(initialHabits);
+        publishHabits(initialHabits);
     }
 
     public void addAchievement(Achievement achievement) {
@@ -325,6 +432,46 @@ public class MainViewModel extends ViewModel {
     }
 
     // -------------------------
+    // Mentés és visszaállítás (export / import)
+    // -------------------------
+
+    /** Az összes adat egyetlen JSON-ba (schemaVersion-nel). */
+    public String buildExportJson() {
+        Boolean water = waterReminderEnabled.getValue();
+        return BackupManager.toJson(character.getValue(), habits.getValue(),
+                achievements.getValue(), water == null || water);
+    }
+
+    public void exportTo(OutputStream out) throws IOException {
+        BackupManager.write(out, buildExportJson());
+    }
+
+    /** Import fájl beolvasása és validálása – még NEM írja felül a jelenlegi adatokat. */
+    public BackupManager.ImportResult readImport(InputStream in) {
+        return BackupManager.read(in);
+    }
+
+    /** A (már validált és jóváhagyott) mentés betöltése: felülírja a jelenlegi adatokat. */
+    public void applyImport(BackupManager.BackupData data) {
+        if (data == null || data.getCharacter() == null || data.getHabits() == null) return;
+
+        UserCharacter user = data.getCharacter();
+        List<Habit> habitList = new ArrayList<>(data.getHabits());
+        List<Achievement> achievementList = new ArrayList<>(data.getAchievements());
+
+        updateCurrentZone(user);
+        persistAll(user, habitList);
+        achievements.setValue(achievementList);
+        if (storage != null) storage.saveAchievements(achievementList);
+
+        Boolean water = data.getWaterReminderEnabled();
+        if (water != null) setWaterReminderEnabled(water);
+
+        // a régi szokások emlékeztetői törlődnek, az importáltak beütemeződnek
+        reminderScheduler.rescheduleAll(habitList);
+    }
+
+    // -------------------------
     // Storage init
     // -------------------------
     public void initStorageHelper(Context context) {
@@ -334,16 +481,22 @@ public class MainViewModel extends ViewModel {
         }
 
         storage = new StorageHelper(context);
+        if (reminderScheduler == ReminderScheduler.NO_OP) {
+            reminderScheduler = new WorkManagerReminderScheduler(context.getApplicationContext());
+        }
 
         // --- Karakter betöltése ---
         UserCharacter loadedCharacter = storage.loadCharacter();
         if (loadedCharacter == null) loadedCharacter = new UserCharacter();
+        // a betöltött karaktert a LiveData-ba is be kell tenni, különben induláskor egy friss
+        // 1. szintű karakter látszana, és az első mentés felülírná a valódi haladást
+        character.setValue(loadedCharacter);
         publishStatsFromCharacter(loadedCharacter);
 
         // --- Szokások ---
         List<Habit> loadedHabits = storage.loadHabits();
         if (loadedHabits != null && !loadedHabits.isEmpty()) {
-            habits.setValue(loadedHabits);
+            publishHabits(loadedHabits);
         } else {
             loadInitialData();
             if (storage != null) storage.saveHabits(habits.getValue());
@@ -360,6 +513,12 @@ public class MainViewModel extends ViewModel {
 
         // --- Zóna beállítása ---
         updateCurrentZone(loadedCharacter);
+
+        // --- Emlékeztetők (induláskor újraütemezve: időzóna-/óraváltás, Google-visszaállítás) ---
+        reminderScheduler.rescheduleAll(habits.getValue());
+        boolean water = storage.isWaterReminderEnabled();
+        waterReminderEnabled.setValue(water);
+        reminderScheduler.setWaterReminderEnabled(water);
 
         storageInitialized = true;
         Log.d("StorageHelper", "Betöltés befejezve.");

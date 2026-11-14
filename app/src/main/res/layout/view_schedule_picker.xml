@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ütemezés választó: a felvétel és a szerkesztés dialógus közösen használja (include) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/schedule_label"
+        android:textColor="#4A2F17"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/scheduleRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:checkedButton="@+id/scheduleDaily"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/scheduleDaily"
+            style="@style/ScheduleRadio"
+            android:text="@string/schedule_daily" />
+
+        <RadioButton
+            android:id="@+id/scheduleWeekdays"
+            style="@style/ScheduleRadio"
+            android:text="@string/schedule_weekdays" />
+
+        <RadioButton
+            android:id="@+id/scheduleTimesPerWeek"
+            style="@style/ScheduleRadio"
+            android:text="@string/schedule_times_per_week" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/weekdaysRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+            <ToggleButton
+                android:id="@+id/dayMon"
+                style="@style/DayChip"
+                android:contentDescription="@string/day_short_mon"
+                android:textOff="@string/day_short_mon"
+                android:textOn="@string/day_short_mon" />
+            <ToggleButton
+                android:id="@+id/dayTue"
+                style="@style/DayChip"
+                android:contentDescription="@string/day_short_tue"
+                android:textOff="@string/day_short_tue"
+                android:textOn="@string/day_short_tue" />
+            <ToggleButton
+                android:id="@+id/dayWed"
+                style="@style/DayChip"
+                android:contentDescription="@string/day_short_wed"
+                android:textOff="@string/day_short_wed"
+                android:textOn="@string/day_short_wed" />
+            <ToggleButton
+                android:id="@+id/dayThu"
+                style="@style/DayChip"
+                android:contentDescription="@string/day_short_thu"
+                android:textOff="@string/day_short_thu"
+                android:textOn="@string/day_short_thu" />
+            <ToggleButton
+                android:id="@+id/dayFri"
+                style="@style/DayChip"
+                android:contentDescription="@string/day_short_fri"
+                android:textOff="@string/day_short_fri"
+                android:textOn="@string/day_short_fri" />
+            <ToggleButton
+                android:id="@+id/daySat"
+                style="@style/DayChip"
+                android:contentDescription="@string/day_short_sat"
+                android:textOff="@string/day_short_sat"
+                android:textOn="@string/day_short_sat" />
+            <ToggleButton
+                android:id="@+id/daySun"
+                style="@style/DayChip"
+                android:contentDescription="@string/day_short_sun"
+                android:textOff="@string/day_short_sun"
+                android:textOn="@string/day_short_sun" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/timesPerWeekInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/input_fantasy_bg"
+        android:hint="@string/schedule_times_per_week_hint"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="1"
+        android:textColor="#3A2C1A"
+        android:textColorHint="#8B6F47"
+        android:visibility="gone" />
+
+    <!-- Emlékeztető: kapcsoló + időpont (csak esedékes, még nem teljesített napokon szól) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/reminderSwitch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/reminder_label"
+            android:textColor="#4A2F17"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/reminderTimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/input_fantasy_bg"
+            android:minWidth="64dp"
+            android:gravity="center"
+            android:textColor="#3A2C1A"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.habitquest.R;
 import com.example.habitquest.model.Achievement;
 import com.example.habitquest.model.Habit;
+import com.example.habitquest.model.Schedule;
 import com.example.habitquest.model.WorldZone;
 import com.example.habitquest.viewmodel.MainViewModel;
 
@@ -65,18 +66,13 @@ public class HabitFragment extends Fragment {
         addHabitButton = view.findViewById(R.id.addHabitButton);
 
         // Adapter
-        adapter = new HabitAdapter(new ArrayList<>(), position -> {
-            viewModel.completeHabit(position);
-        });
+        adapter = new HabitAdapter(habit -> viewModel.completeHabit(habit.getId()));
         adapter.setOnHabitLongClickListener(this::showHabitOptionsDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
 
-        // Szokások figyelése
-        viewModel.getHabits().observe(getViewLifecycleOwner(), habits -> {
-            adapter.habitList = habits;
-            adapter.notifyDataSetChanged();
-        });
+        // Szokások figyelése (a ViewModel által rendezett, mai állapottal kiegészített lista)
+        viewModel.getHabitItems().observe(getViewLifecycleOwner(), adapter::setItems);
 
         // Karakter figyelése
         viewModel.getCharacter().observe(getViewLifecycleOwner(), character -> {
@@ -85,13 +81,13 @@ public class HabitFragment extends Fragment {
             int level = character.getLevel();
             int xp = character.getExperience();
 
-            characterStats.setText("Szint: " + level + " | XP: " + xp);
+            characterStats.setText(getString(R.string.habit_header_stats, level, xp));
             xpBar.setMax(level * 100);
             xpBar.setProgress(xp);
 
-            String levelTitle = "Tanonc";
-            if (level >= 5) levelTitle = "Harcos";
-            if (level >= 10) levelTitle = "Mester";
+            int levelTitle = R.string.level_title_novice;
+            if (level >= 5) levelTitle = R.string.level_title_warrior;
+            if (level >= 10) levelTitle = R.string.level_title_master;
             levelName.setText(levelTitle);
 
             // frissítjük a karakter képét
@@ -109,8 +105,13 @@ public class HabitFragment extends Fragment {
         }
 
         UIHelper.bindBackgroundToZone(this, viewModel);
+    }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        // napváltás után (pl. éjfélkor háttérben maradt app) újraszámoljuk a mai esedékességet
+        viewModel.refreshHabitItems();
     }
 
 
@@ -128,6 +129,7 @@ public class HabitFragment extends Fragment {
         final EditText achTargetInput = dialogView.findViewById(R.id.achTargetInput);
         Button cancelButton = dialogView.findViewById(R.id.cancelButton);
         Button confirmButton = dialogView.findViewById(R.id.confirmButton);
+        final HabitFormBinder form = new HabitFormBinder(dialogView);
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
@@ -148,7 +150,11 @@ public class HabitFragment extends Fragment {
             } catch (NumberFormatException ignored) {}
 
             if (!habitName.isEmpty()) {
+                Schedule schedule = form.readSchedule();
+                if (schedule == null) return; // hibás ütemezés → a dialógus nyitva marad
                 Habit newHabit = new Habit(habitName, habitDesc, xp);
+                newHabit.setSchedule(schedule);
+                newHabit.setReminderMinutes(form.readReminder());
                 viewModel.addHabit(newHabit);
             }
 
@@ -163,7 +169,7 @@ public class HabitFragment extends Fragment {
                 Achievement newAch = new Achievement(
                         achName.toLowerCase().replace(" ", "_"),
                         achName,
-                        achDesc.isEmpty() ? "Új achievement" : achDesc,
+                        achDesc.isEmpty() ? getString(R.string.habit_ach_default_desc) : achDesc,
                         false,
                         achTarget,
                         habitName  // összekapcsoljuk a szokással
@@ -180,33 +186,31 @@ public class HabitFragment extends Fragment {
     /**
      Szokás hosszú nyomásra megjelenő opciói: szerkesztés / törlés
      */
-    private void showHabitOptionsDialog(int position) {
-        List<Habit> habitList = viewModel.getHabits().getValue();
-        if (habitList == null || position < 0 || position >= habitList.size()) return;
-        Habit habit = habitList.get(position);
+    private void showHabitOptionsDialog(Habit habit) {
+        if (habit == null) return;
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle(habit.getName())
-                .setItems(new CharSequence[]{"Szerkesztés", "Törlés"}, (d, which) -> {
+                .setItems(new CharSequence[]{getString(R.string.action_edit), getString(R.string.action_delete)}, (d, which) -> {
                     if (which == 0) {
-                        showEditHabitDialog(position, habit);
+                        showEditHabitDialog(habit);
                     } else {
-                        confirmDeleteHabit(position, habit);
+                        confirmDeleteHabit(habit);
                     }
                 })
-                .setNegativeButton("Mégse", (d, which) -> d.cancel())
+                .setNegativeButton(R.string.action_cancel, (d, which) -> d.cancel())
                 .create();
 
         dialog.setOnShowListener(d -> styleDialogButtons(dialog));
         dialog.show();
     }
 
-    private void confirmDeleteHabit(int position, Habit habit) {
+    private void confirmDeleteHabit(Habit habit) {
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setTitle("Szokás törlése")
-                .setMessage("Biztosan törlöd: \"" + habit.getName() + "\"?")
-                .setPositiveButton("Törlés", (d, which) -> viewModel.deleteHabit(position))
-                .setNegativeButton("Mégse", (d, which) -> d.cancel())
+                .setTitle(R.string.habit_delete_title)
+                .setMessage(getString(R.string.habit_delete_message, habit.getName()))
+                .setPositiveButton(R.string.action_delete, (d, which) -> viewModel.deleteHabit(habit.getId()))
+                .setNegativeButton(R.string.action_cancel, (d, which) -> d.cancel())
                 .create();
 
         dialog.setOnShowListener(d -> styleDialogButtons(dialog));
@@ -222,7 +226,7 @@ public class HabitFragment extends Fragment {
         if (negative != null) negative.setTextColor(color);
     }
 
-    private void showEditHabitDialog(int position, Habit habit) {
+    private void showEditHabitDialog(Habit habit) {
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_habit, null);
 
         final EditText nameInput = dialogView.findViewById(R.id.editHabitNameInput);
@@ -230,6 +234,9 @@ public class HabitFragment extends Fragment {
         final EditText xpInput = dialogView.findViewById(R.id.editHabitXpInput);
         Button cancelButton = dialogView.findViewById(R.id.editCancelButton);
         Button confirmButton = dialogView.findViewById(R.id.editConfirmButton);
+        final HabitFormBinder form = new HabitFormBinder(dialogView);
+        form.setSchedule(habit.getSchedule());
+        form.setReminder(habit.getReminderMinutes());
 
         nameInput.setText(habit.getName());
         descInput.setText(habit.getDescription());
@@ -255,7 +262,10 @@ public class HabitFragment extends Fragment {
                 xp = Integer.parseInt(xpInput.getText().toString());
             } catch (NumberFormatException ignored) {}
 
-            viewModel.updateHabit(position, habitName, habitDesc, xp);
+            Schedule schedule = form.readSchedule();
+            if (schedule == null) return; // hibás ütemezés → a dialógus nyitva marad
+
+            viewModel.updateHabit(habit.getId(), habitName, habitDesc, xp, schedule, form.readReminder());
             dialog.dismiss();
         });
 

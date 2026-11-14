@@ -7,7 +7,17 @@ fejlődik a kinézete, és új világzónákba jut el.
 ## Funkciók
 
 - **Szokások** – szokások felvétele, szerkesztése, törlése és teljesítése. A program számolja
-  a napi és az összes teljesítést, valamint az aktuális és a leghosszabb napi sorozatot (streak).
+  a napi és az összes teljesítést, valamint az aktuális és a leghosszabb sorozatot (streak).
+  Minden szokásnak stabil azonosítója (UUID) van; a régi mentések betöltéskor automatikusan
+  migrálódnak, adatvesztés nélkül.
+- **Rugalmas ütemezés** – egy szokás lehet *minden napos*, *a hét bizonyos napjain* esedékes
+  (pl. H, Sze, P) vagy *heti X alkalom* (bármelyik napon). A sorozat csak akkor szakad meg, ha
+  egy esedékes alkalom kimarad – a nem esedékes napok kihagyása nem számít. A listán a ma
+  esedékes szokások vannak elöl, a nem esedékesek halványítva a végén.
+- **Szokásonkénti emlékeztető** – szokásonként beállítható időpont, ami csak esedékes napokon
+  szól, és akkor sem, ha a szokás aznap már teljesítve van. Az értesítésre koppintva az app a
+  Szokások képernyőn nyílik meg. (WorkManager, nem kér pontos-riasztás engedélyt; Doze módban
+  néhány perc csúszás előfordulhat.)
 - **Karakter és kasztok** – első indításkor kasztot választasz: **Harcos ⚔️**, **Mágus 🔮**
   vagy **Tolvaj 🗡️**. A kasztok szintlépéskor eltérő bónuszokat adnak, és a karakter képe
   szintenként változik.
@@ -20,9 +30,15 @@ fejlődik a kinézete, és új világzónákba jut el.
   Erdő (1–5. szint) → Hegység (6–10.) → Város (11.+).
 - **Bolt** – érméből italokat és ételeket vehetsz, amik azonnal visszatöltik a statokat.
 - **Achievementek** – feloldható eredmények a profil oldalon.
-- **Vízivás-emlékeztető** – WorkManagerrel 30 percenként értesítés, hogy igyál egy pohár vizet
-  (Android 13+ esetén értesítési engedély kell hozzá).
-- **Helyi mentés** – minden adat a készüléken marad (SharedPreferences + Gson JSON).
+- **Vízivás-emlékeztető** – WorkManagerrel 30 percenként értesítés, hogy igyál egy pohár vizet.
+  A Profil → Beállítások / Adatok részen ki-/bekapcsolható. (Android 13+ esetén minden
+  értesítéshez értesítési engedély kell.)
+- **Mentés és visszaállítás** – a Profil → Beállítások / Adatok részen az összes adat
+  (karakter, szokások, achievementek, beállítások) egyetlen verziózott JSON fájlba exportálható,
+  és onnan visszatölthető (pl. telefonváltáskor). A rendszer fájlválasztóját használja, így nem
+  kér tárhely-engedélyt; import előtt validál és megerősítést kér.
+- **Helyi mentés + Google-mentés** – minden adat a készüléken marad (SharedPreferences + Gson
+  JSON); az Android automatikus mentése és az eszközök közötti átvitel ezt a fájlt is viszi.
 
 ## Technológia
 
@@ -41,11 +57,11 @@ fejlődik a kinézete, és új világzónákba jut el.
 ```
 app/src/main/java/com/example/habitquest/
 ├── MainActivity.java          # navigáció, kasztválasztás, értesítések beállítása
-├── model/                     # Habit, UserCharacter, WorldZone, ShopItem, Achievement
+├── model/                     # Habit, Schedule, UserCharacter, WorldZone, ShopItem, Achievement
 ├── viewmodel/MainViewModel    # játéklogika: jutalmak, szintlépés, bolt, zónák
 ├── view/                      # fragmentek (Szokások, Térkép, Bolt, Profil) és adapterek
-├── notifications/WaterWorker  # vízivás-emlékeztető
-└── utils/StorageHelper        # mentés és betöltés
+├── notifications/             # WaterWorker, HabitReminderWorker, ReminderScheduler (WorkManager)
+└── utils/                     # StorageHelper (mentés, migráció), BackupManager (export/import)
 ```
 
 ## Futtatás

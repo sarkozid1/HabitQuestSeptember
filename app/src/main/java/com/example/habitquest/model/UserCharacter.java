@@ -135,7 +135,16 @@ public class UserCharacter {
     // -------------------------
     // Kép frissítés — Map alapú, bővíthető megoldás
     // -------------------------
+    /**
+     * A karakterkép újraszámolása kaszt + szint alapján. Betöltéskor / importkor hívjuk,
+     * mert a mentett erőforrás-azonosító (R.drawable.*) egy app-frissítés után megváltozhat.
+     */
+    public void refreshCharacterImage() {
+        updateCharacterImage();
+    }
+
     private void updateCharacterImage() {
+        if (level < 1) level = 1;
         int[] images = CLASS_IMAGES.getOrDefault(characterClass,
                 new int[]{ R.drawable.lv1 });
         int index = Math.min(level - 1, images.length - 1);

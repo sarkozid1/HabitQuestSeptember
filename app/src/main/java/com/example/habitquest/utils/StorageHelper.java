@@ -28,6 +28,7 @@ public class StorageHelper {
     private static final String KEY_CHARACTER = "character_data";
     private static final String KEY_HABITS = "habits_data";
     private static final String KEY_ACHIEVEMENTS = "achievements_data";
+    private static final String KEY_WATER_REMINDER = "water_reminder_enabled";
 
     private final SharedPreferences prefs;
     private final Gson gson;
@@ -64,44 +65,7 @@ public class StorageHelper {
             if (loaded == null) return new UserCharacter();
 
             // ✅ Migration (régi mentésekben az új mezők 0-k lehetnek)
-            boolean changed = false;
-
-            if (loaded.getHealthMax() <= 0) {
-                int hpMax = 100 + Math.max(0, loaded.getLevel() - 1) * 5;
-                loaded.setHealthMax(hpMax);
-                changed = true;
-            }
-
-            if (loaded.getEnergyMax() <= 0) {
-                int enMax = 100 + Math.max(0, loaded.getLevel() - 1) * 5;
-                loaded.setEnergyMax(enMax);
-                changed = true;
-            }
-
-            if (loaded.getHealth() <= 0) {
-                loaded.setHealth(loaded.getHealthMax());
-                changed = true;
-            }
-
-            if (loaded.getEnergy() <= 0) {
-                loaded.setEnergy(70);
-                changed = true;
-            }
-
-            if (loaded.getMood() <= 0) {
-                loaded.setMood(70);
-                changed = true;
-            }
-
-            if (loaded.getUpdatedAt() <= 0) {
-                loaded.setUpdatedAt(System.currentTimeMillis());
-                changed = true;
-            }
-
-            if (loaded.getCharacterImageResId() == 0) {
-                loaded.setCharacterImageResId(R.drawable.lv1);
-                changed = true;
-            }
+            boolean changed = migrateCharacter(loaded);
 
             if (changed) {
                 saveCharacter(loaded);
@@ -115,6 +79,59 @@ public class StorageHelper {
             Log.e("StorageHelper", "Hiba a karakter betöltésekor: " + e.getMessage());
             return new UserCharacter();
         }
+    }
+
+    /**
+     * Karakter migráció: régi mentésekben az új mezők 0-k lehetnek. Importnál is ez fut.
+     * A karakterképet mindig újraszámolja (a mentett R.drawable id app-frissítéskor változhat).
+     * @return true, ha bármi változott
+     */
+    public static boolean migrateCharacter(UserCharacter c) {
+        if (c == null) return false;
+        boolean changed = false;
+
+        if (c.getHealthMax() <= 0) {
+            int hpMax = 100 + Math.max(0, c.getLevel() - 1) * 5;
+            c.setHealthMax(hpMax);
+            changed = true;
+        }
+
+        if (c.getEnergyMax() <= 0) {
+            int enMax = 100 + Math.max(0, c.getLevel() - 1) * 5;
+            c.setEnergyMax(enMax);
+            changed = true;
+        }
+
+        if (c.getHealth() <= 0) {
+            c.setHealth(c.getHealthMax());
+            changed = true;
+        }
+
+        if (c.getEnergy() <= 0) {
+            c.setEnergy(70);
+            changed = true;
+        }
+
+        if (c.getMood() <= 0) {
+            c.setMood(70);
+            changed = true;
+        }
+
+        if (c.getUpdatedAt() <= 0) {
+            c.setUpdatedAt(System.currentTimeMillis());
+            changed = true;
+        }
+
+        if (c.getCharacterImageResId() == 0) {
+            c.setCharacterImageResId(R.drawable.lv1);
+            changed = true;
+        }
+
+        int imageBefore = c.getCharacterImageResId();
+        c.refreshCharacterImage();
+        if (c.getCharacterImageResId() != imageBefore) changed = true;
+
+        return changed;
     }
 
     // -------------------------
@@ -135,12 +152,30 @@ public class StorageHelper {
             Type type = new TypeToken<List<Habit>>() {}.getType();
             List<Habit> list = gson.fromJson(json, type);
             if (list == null) list = new ArrayList<>();
+            if (migrateHabits(list)) {
+                saveHabits(list);
+                Log.d("StorageHelper", "Szokások migrálva és újramentve.");
+            }
             Log.d("StorageHelper", "Szokások betöltve: " + list.size());
             return list;
         } catch (Exception e) {
             Log.e("StorageHelper", "Hiba a szokások betöltésekor: " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Régi mentések pótlása: hiányzó id-k generálása, ütemezés "minden nap"-ra állítása.
+     * Kiszűri a null elemeket is. Importnál is ugyanez fut.
+     * @return true, ha bármi változott (vissza kell menteni)
+     */
+    public static boolean migrateHabits(List<Habit> habits) {
+        if (habits == null) return false;
+        boolean changed = habits.removeIf(h -> h == null);
+        for (Habit h : habits) {
+            if (h.migrate()) changed = true;
+        }
+        return changed;
     }
 
     // -------------------------
@@ -167,6 +202,17 @@ public class StorageHelper {
             Log.e("StorageHelper", "Hiba az achievementek betöltésekor: " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    // -------------------------
+    // BEÁLLÍTÁSOK
+    // -------------------------
+    public boolean isWaterReminderEnabled() {
+        return prefs.getBoolean(KEY_WATER_REMINDER, true);
+    }
+
+    public void setWaterReminderEnabled(boolean enabled) {
+        prefs.edit().putBoolean(KEY_WATER_REMINDER, enabled).apply();
     }
 
     // -------------------------
