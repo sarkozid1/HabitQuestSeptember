@@ -107,6 +107,28 @@ public class BackupManagerTest {
     }
 
     @Test
+    public void exportThenImport_keepsHistoryAndCreatedDate() {
+        Habit water = habits.get(0);
+        BackupManager.BackupData data =
+                BackupManager.parse(BackupManager.toJson(character, habits, achievements, true)).getData();
+        Habit imported = data.getHabits().get(0);
+        assertEquals(1, imported.getHistoryCountOn(LocalDate.of(2026, 11, 13)));
+        assertEquals(1, imported.getHistoryCountOn(LocalDate.of(2026, 11, 14)));
+        assertEquals(water.getCreatedLocalDate(), imported.getCreatedLocalDate());
+    }
+
+    @Test
+    public void importOldBackupWithoutHistory_givesEmptyHistory() {
+        BackupManager.BackupData data = BackupManager.parse(
+                "{\"schemaVersion\":1,\"character\":{\"level\":2},"
+                        + "\"habits\":[{\"id\":\"a\",\"name\":\"Séta\",\"completionCount\":9}]}").getData();
+        Habit h = data.getHabits().get(0);
+        assertTrue(h.getHistory().isEmpty());
+        assertNotNull(h.getCreatedLocalDate());
+        assertEquals(9, h.getCompletionCount());
+    }
+
+    @Test
     public void export_containsSchemaVersion() {
         JsonObject root = JsonParser.parseString(
                 BackupManager.toJson(character, habits, achievements, true)).getAsJsonObject();

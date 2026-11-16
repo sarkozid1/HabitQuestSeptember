@@ -48,6 +48,10 @@ public class ProfileFragment extends Fragment {
     private final ActivityResultLauncher<String[]> importLauncher = registerForActivityResult(
             new ActivityResultContracts.OpenDocument(), this::onImportFileChosen);
 
+    /** Értesítési engedély a vízivás-emlékeztető bekapcsolásakor (Android 13+). */
+    private final ActivityResultLauncher<String> notificationPermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), granted -> { });
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // betölti a layout-ot (fragment_profile.xml)
@@ -111,7 +115,19 @@ public class ProfileFragment extends Fragment {
         waterSwitch.setOnCheckedChangeListener((button, checked) -> {
             Boolean current = viewModel.getWaterReminderEnabled().getValue();
             if (current == null || current != checked) viewModel.setWaterReminderEnabled(checked);
+            if (checked && button.isPressed()
+                    && com.example.habitquest.notifications.NotificationHelper.needsPermissionRequest(requireContext())) {
+                notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+            }
         });
+
+        // 📊 Statisztika (vissza gombbal a Profilra tér vissza)
+        view.findViewById(R.id.openStatsButton).setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.mainFragmentContainer, new StatsFragment())
+                        .addToBackStack("stats")
+                        .commit());
 
         // 📤 / 📥 Mentés és visszaállítás
         view.findViewById(R.id.exportButton).setOnClickListener(v ->

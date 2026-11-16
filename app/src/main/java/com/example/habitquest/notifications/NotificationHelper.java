@@ -42,6 +42,11 @@ public final class NotificationHelper {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    /** Android 13+: még nincs engedély, tehát kérni kell (alatta mindig false). */
+    public static boolean needsPermissionRequest(Context context) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !canPostNotifications(context);
+    }
+
     /** Koppintásra az app a Szokások képernyőn nyílik meg. */
     public static PendingIntent openHabitsIntent(Context context, int requestCode) {
         Intent intent = new Intent(context, MainActivity.class);

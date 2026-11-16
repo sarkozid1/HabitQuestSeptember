@@ -29,6 +29,7 @@ public class StorageHelper {
     private static final String KEY_HABITS = "habits_data";
     private static final String KEY_ACHIEVEMENTS = "achievements_data";
     private static final String KEY_WATER_REMINDER = "water_reminder_enabled";
+    private static final String KEY_ONBOARDING_DONE = "onboarding_done";
 
     private final SharedPreferences prefs;
     private final Gson gson;
@@ -170,10 +171,15 @@ public class StorageHelper {
      * @return true, ha bármi változott (vissza kell menteni)
      */
     public static boolean migrateHabits(List<Habit> habits) {
+        return migrateHabits(habits, java.time.LocalDate.now());
+    }
+
+    /** Migráció adott "mai" nappal (tesztelhető). */
+    public static boolean migrateHabits(List<Habit> habits, java.time.LocalDate today) {
         if (habits == null) return false;
         boolean changed = habits.removeIf(h -> h == null);
         for (Habit h : habits) {
-            if (h.migrate()) changed = true;
+            if (h.migrate(today)) changed = true;
         }
         return changed;
     }
@@ -213,6 +219,20 @@ public class StorageHelper {
 
     public void setWaterReminderEnabled(boolean enabled) {
         prefs.edit().putBoolean(KEY_WATER_REMINDER, enabled).apply();
+    }
+
+    /** Első indítás bevezetője lefutott-e (meglévő felhasználóknál a repository állítja be). */
+    public boolean isOnboardingDone() {
+        return prefs.getBoolean(KEY_ONBOARDING_DONE, false);
+    }
+
+    public void setOnboardingDone(boolean done) {
+        prefs.edit().putBoolean(KEY_ONBOARDING_DONE, done).apply();
+    }
+
+    /** Van-e már mentett karakter vagy szokáslista (= meglévő felhasználó). */
+    public boolean hasSavedUserData() {
+        return prefs.contains(KEY_CHARACTER) || prefs.contains(KEY_HABITS);
     }
 
     // -------------------------

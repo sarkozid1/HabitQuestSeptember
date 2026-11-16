@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Első indítás: lapozható bevezető (ViewPager2) + lapozó gombok -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- ugyanaz az erdős háttér, mint a főképernyőn -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.85"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/map_forest" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/onboardingPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/onboardingDots"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:letterSpacing="0.3"
+        android:textColor="@color/ink_primary"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/onboardingBack"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_pill_secondary"
+            android:backgroundTint="@null"
+            android:stateListAnimator="@null"
+            android:text="@string/onboarding_back"
+            android:textAllCaps="false"
+            android:textColor="@color/ink_secondary"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/onboardingNext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.4"
+            android:background="@drawable/button_pill_primary"
+            android:backgroundTint="@null"
+            android:stateListAnimator="@null"
+            android:text="@string/onboarding_next"
+            android:textAllCaps="false"
+            android:textColor="@color/ink_primary"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>
+</FrameLayout>

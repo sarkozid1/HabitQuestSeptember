@@ -144,6 +144,7 @@ public class MainViewModelReminderTest {
     @Test
     public void initStorageHelper_publishesSavedCharacterAndMigratedHabits() {
         android.content.Context ctx = androidx.test.core.app.ApplicationProvider.getApplicationContext();
+        com.example.habitquest.data.HabitRepository.resetInstanceForTests();
         com.example.habitquest.utils.StorageHelper storage = new com.example.habitquest.utils.StorageHelper(ctx);
         storage.clearAllData();
         com.example.habitquest.model.UserCharacter saved = new com.example.habitquest.model.UserCharacter();

@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation (libs.gson)
+    implementation(libs.viewpager2)
     implementation (libs.material)
     testImplementation(libs.junit)
     testImplementation("androidx.arch.core:core-testing:2.2.0")

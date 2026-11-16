@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget háttér: átlátszatlan pergamen arany kerettel – sötét és világos háttérképen is olvasható -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#F5E9CC" />
+    <corners android:radius="22dp" />
+    <stroke android:width="2dp" android:color="@color/gold_accent" />
+</shape>

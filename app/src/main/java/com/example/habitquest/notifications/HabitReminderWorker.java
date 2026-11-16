@@ -11,9 +11,7 @@ import androidx.work.WorkerParameters;
 
 import com.example.habitquest.R;
 import com.example.habitquest.model.Habit;
-import com.example.habitquest.utils.StorageHelper;
-
-import java.time.LocalDate;
+import com.example.habitquest.data.HabitRepository;
 
 /**
  * Egy szokás emlékeztetője. Elsüléskor a MENTETT állapotból dönt:
@@ -36,13 +34,12 @@ public class HabitReminderWorker extends Worker {
         String habitId = getInputData().getString(KEY_HABIT_ID);
         if (habitId == null) return Result.success();
 
-        Habit habit = null;
-        for (Habit h : new StorageHelper(ctx).loadHabits()) {
-            if (habitId.equals(h.getId())) { habit = h; break; }
-        }
+        // ugyanaz az adatréteg, mint az appban és a widgetben
+        HabitRepository repository = HabitRepository.getInstance(ctx);
+        Habit habit = repository.findHabit(habitId);
         if (habit == null || !habit.hasReminder()) return Result.success(); // törölték / kikapcsolták
 
-        if (habit.shouldRemindOn(LocalDate.now()) && NotificationHelper.canPostNotifications(ctx)) {
+        if (habit.shouldRemindOn(repository.today()) && NotificationHelper.canPostNotifications(ctx)) {
             NotificationHelper.createChannels(ctx);
             int notifId = habitId.hashCode();
             NotificationCompat.Builder builder =

@@ -44,6 +44,17 @@ public class HabitFragment extends Fragment {
     private RecyclerView recyclerView;
     private Button addHabitButton;
 
+    /** Értesítési engedély kérése az első emlékeztető bekapcsolásakor (Android 13+). */
+    private final androidx.activity.result.ActivityResultLauncher<String> notificationPermission =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+                    granted -> { });
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (com.example.habitquest.notifications.NotificationHelper.needsPermissionRequest(requireContext())) {
+            notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -98,12 +109,6 @@ public class HabitFragment extends Fragment {
         //Új szokás hozzáadása
         addHabitButton.setOnClickListener(v -> showAddHabitDialog());
 
-        //  Csak ha nincs adat akkor töltse be az alapértelmezett szokásokat
-        List<Habit> existingHabits = viewModel.getHabits().getValue();
-        if (existingHabits == null || existingHabits.isEmpty()) {
-            viewModel.loadInitialData();
-        }
-
         UIHelper.bindBackgroundToZone(this, viewModel);
     }
 
@@ -130,6 +135,7 @@ public class HabitFragment extends Fragment {
         Button cancelButton = dialogView.findViewById(R.id.cancelButton);
         Button confirmButton = dialogView.findViewById(R.id.confirmButton);
         final HabitFormBinder form = new HabitFormBinder(dialogView);
+        form.setOnReminderEnabled(this::requestNotificationPermissionIfNeeded);
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
@@ -235,6 +241,7 @@ public class HabitFragment extends Fragment {
         Button cancelButton = dialogView.findViewById(R.id.editCancelButton);
         Button confirmButton = dialogView.findViewById(R.id.editConfirmButton);
         final HabitFormBinder form = new HabitFormBinder(dialogView);
+        form.setOnReminderEnabled(this::requestNotificationPermissionIfNeeded);
         form.setSchedule(habit.getSchedule());
         form.setReminder(habit.getReminderMinutes());
 

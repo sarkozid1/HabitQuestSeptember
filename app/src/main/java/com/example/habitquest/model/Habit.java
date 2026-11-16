@@ -6,6 +6,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -48,12 +52,25 @@ public class Habit {
     /** Emlékeztető időpontja éjfél óta eltelt percekben (pl. 8:30 = 510); null = nincs. */
     private Integer reminderMinutes = null;
 
+    /**
+     * Napi teljesítési előzmény: ISO dátum → aznapi teljesítések száma.
+     * Csak a legutóbbi {@link #HISTORY_DAYS} nap marad meg (a statisztikához ennyi elég).
+     * Régi mentésekben hiányzik → üres előzmény (a számlálók és a streak változatlanok).
+     */
+    private Map<String, Integer> history = new TreeMap<>();
+    /** A szokás felvételének napja (ISO); a sikerességi arányhoz kell. Régi mentésnél a migráció napja. */
+    private String createdDate = null;
+
+    /** Ennyi napnyi előzményt őrzünk meg (kb. 13 hónap). */
+    public static final int HISTORY_DAYS = 400;
+
     /** Gson-nak: így a mezők kezdőértékei régi JSON betöltésekor is lefutnak. */
     @SuppressWarnings("unused")
     private Habit() { }
 
     public Habit(String name, String description, int experienceReward) {
         this.id = UUID.randomUUID().toString();
+        this.createdDate = LocalDate.now().format(ISO); // a repository a saját órájával felülírhatja
         this.name = name;
         this.description = description;
         this.experienceReward = experienceReward;
@@ -94,9 +111,55 @@ public class Habit {
             daysDoneThisWeek++;
 
             lastCompletionDate = todayStr;
+            pruneHistory(today);
         }
         completionsToday++;
         completionCount++; // összes teljesítés növelése
+
+        if (history == null) history = new TreeMap<>();
+        Integer prev = history.get(todayStr);
+        history.put(todayStr, prev == null ? 1 : prev + 1);
+    }
+
+    /** A {@link #HISTORY_DAYS} napnál régebbi előzmény-bejegyzések törlése. */
+    private void pruneHistory(LocalDate today) {
+        if (history == null || history.isEmpty()) return;
+        String cutoff = today.minusDays(HISTORY_DAYS - 1).format(ISO);
+        Iterator<String> it = history.keySet().iterator();
+        while (it.hasNext()) {
+            // az ISO dátumok szövegként is időrendben hasonlíthatók
+            if (it.next().compareTo(cutoff) < 0) it.remove();
+        }
+    }
+
+    // -------------------------
+    // Előzmény
+    // -------------------------
+
+    /** Az adott napi teljesítések száma az előzményből (0, ha nincs adat). */
+    public int getHistoryCountOn(LocalDate date) {
+        if (history == null) return 0;
+        Integer n = history.get(date.format(ISO));
+        return n == null ? 0 : n;
+    }
+
+    /** Az előzmény (módosíthatatlan nézet). */
+    public Map<String, Integer> getHistory() {
+        return history == null ? Collections.emptyMap() : Collections.unmodifiableMap(history);
+    }
+
+    /** A felvétel napja, vagy null, ha ismeretlen. */
+    public LocalDate getCreatedLocalDate() {
+        if (createdDate == null || createdDate.isEmpty()) return null;
+        try {
+            return LocalDate.parse(createdDate, ISO);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void setCreatedDate(LocalDate date) {
+        this.createdDate = date != null ? date.format(ISO) : null;
     }
 
     // -------------------------
@@ -240,7 +303,17 @@ public class Habit {
      * @return true, ha bármi változott
      */
     public boolean migrate() {
+        return migrate(LocalDate.now());
+    }
+
+    /**
+     * Migráció adott "mai" nappal: a hiányzó felvételi dátum a migráció napja lesz
+     * (onnantól van előzmény), az előzmény üresen indul.
+     */
+    public boolean migrate(LocalDate today) {
         boolean changed = ensureId();
+        if (history == null) { history = new TreeMap<>(); changed = true; }
+        if (getCreatedLocalDate() == null) { createdDate = today.format(ISO); changed = true; }
         if (schedule == null) { schedule = Schedule.daily(); changed = true; }
         if (lastCompletionDate == null) { lastCompletionDate = ""; changed = true; }
         if (weekStartDate == null) { weekStartDate = ""; changed = true; }

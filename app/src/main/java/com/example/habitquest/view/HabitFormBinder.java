@@ -38,6 +38,8 @@ class HabitFormBinder {
     private final Map<DayOfWeek, ToggleButton> dayButtons = new EnumMap<>(DayOfWeek.class);
     private final MaterialSwitch reminderSwitch;
     private final TextView reminderTimeText;
+    /** Hívódik, amikor a felhasználó BEKAPCSOLJA az emlékeztetőt (pl. engedélykéréshez). */
+    private Runnable onReminderEnabled;
     /** A kiválasztott emlékeztető időpont (éjfél óta eltelt perc); alapból 8:00. */
     private int reminderMinutes = 8 * 60;
 
@@ -56,12 +58,19 @@ class HabitFormBinder {
 
         reminderSwitch = dialogRoot.findViewById(R.id.reminderSwitch);
         reminderTimeText = dialogRoot.findViewById(R.id.reminderTimeText);
-        reminderSwitch.setOnCheckedChangeListener((b, checked) -> updateVisibility());
+        reminderSwitch.setOnCheckedChangeListener((b, checked) -> {
+            updateVisibility();
+            if (checked && b.isPressed() && onReminderEnabled != null) onReminderEnabled.run();
+        });
         reminderTimeText.setOnClickListener(v -> showTimePicker());
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> updateVisibility());
         updateReminderText();
         updateVisibility();
+    }
+
+    void setOnReminderEnabled(Runnable callback) {
+        this.onReminderEnabled = callback;
     }
 
     private void showTimePicker() {

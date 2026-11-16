@@ -1,23 +1,13 @@
 package com.example.habitquest;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.habitquest.model.UserCharacter;
+import com.example.habitquest.data.HabitRepository;
 import com.example.habitquest.view.HabitFragment;
+import com.example.habitquest.view.OnboardingActivity;
 import com.example.habitquest.view.MapFragment;
 import com.example.habitquest.view.ProfileFragment;
 import com.example.habitquest.view.ShopFragment;
@@ -30,11 +20,13 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_OPEN_TAB = "open_tab";
     public static final String TAB_HABITS = "habits";
 
-    private static final int NOTIF_REQ = 101;
     private MainViewModel viewModel;
 
     /** Fragment betöltése a fő containerbe. */
     private void loadFragment(Fragment fragment) {
+        // fülváltáskor a megnyitott alképernyő (pl. Statisztika) back stack-je törlődik
+        getSupportFragmentManager().popBackStack(null,
+                androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.mainFragmentContainer, fragment)
@@ -44,6 +36,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Első indítás: bevezető (kasztválasztással); meglévő, kaszt nélküli felhasználónál
+        // csak a kasztválasztó lap. A régi kasztválasztó dialógus megszűnt.
+        HabitRepository repository = HabitRepository.getInstance(this);
+        if (repository.needsOnboarding() || repository.needsClassSelection()) {
+            Intent onboarding = new Intent(this, OnboardingActivity.class);
+            onboarding.putExtra(OnboardingActivity.EXTRA_CLASS_ONLY, !repository.needsOnboarding());
+            startActivity(onboarding);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         // ViewModel inicializálása
@@ -52,14 +56,6 @@ public class MainActivity extends AppCompatActivity {
         // StorageHelper inicializálása
         if (!viewModel.isStorageInitialized()) {
             viewModel.initStorageHelper(this);
-        }
-
-        // Kasztválasztás csak első indításkor
-        UserCharacter user = viewModel.getCharacter().getValue();
-        if (user != null &&
-                (user.getCharacterClass() == null ||
-                        user.getCharacterClass().equals("none"))) {
-            showClassSelectionDialog();
         }
 
         // Alapértelmezett képernyő: Szokások
@@ -87,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        // 👉 Értesítési engedélykérés (a vízivás- és szokás-emlékeztetőket a ViewModel ütemezi)
-        requestNotificationPermission();
+        // Az értesítési engedélyt az onboarding kéri (új felhasználó), illetve az első
+        // emlékeztető bekapcsolásakor kérjük (meglévő felhasználó) – induláskor már nem.
 
         handleOpenTabIntent(getIntent());
     }
@@ -108,56 +104,5 @@ public class MainActivity extends AppCompatActivity {
         if (bottomNav.getSelectedItemId() != R.id.nav_habits) {
             bottomNav.setSelectedItemId(R.id.nav_habits); // a listener betölti a fragmentet
         }
-    }
-
-    /** Android 13+ engedélykérés */
-    private void requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(
-                        this,
-                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                        NOTIF_REQ
-                );
-            }
-        }
-    }
-
-    // Kasztválasztó dialógus az első indításkor
-    private void showClassSelectionDialog() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_class_selection, null);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setCancelable(false)
-                .create();
-
-        dialog.show();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        dialogView.findViewById(R.id.classWarrior).setOnClickListener(v -> {
-            viewModel.setCharacterClass("warrior");
-            Toast.makeText(this, "Kaszt kiválasztva: Harcos ⚔️", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
-
-        dialogView.findViewById(R.id.classMage).setOnClickListener(v -> {
-            viewModel.setCharacterClass("mage");
-            Toast.makeText(this, "Kaszt kiválasztva: Mágus 🔮", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
-
-        dialogView.findViewById(R.id.classRogue).setOnClickListener(v -> {
-            viewModel.setCharacterClass("rogue");
-            Toast.makeText(this, "Kaszt kiválasztva: Tolvaj 🗡️", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        });
     }
 }

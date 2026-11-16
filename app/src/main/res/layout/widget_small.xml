@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kicsi widget: avatar + szint + XP + "ma X/Y kész" -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/widgetAvatar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/karakter_ikon"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/widgetLevel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="serif"
+        android:textColor="@color/ink_primary"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <ProgressBar
+        android:id="@+id/widgetXpBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:progressDrawable="@drawable/xp_progress_bar" />
+
+    <TextView
+        android:id="@+id/widgetToday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/ink_secondary"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+</LinearLayout>

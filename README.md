@@ -18,9 +18,12 @@ fejlődik a kinézete, és új világzónákba jut el.
   szól, és akkor sem, ha a szokás aznap már teljesítve van. Az értesítésre koppintva az app a
   Szokások képernyőn nyílik meg. (WorkManager, nem kér pontos-riasztás engedélyt; Doze módban
   néhány perc csúszás előfordulhat.)
-- **Karakter és kasztok** – első indításkor kasztot választasz: **Harcos ⚔️**, **Mágus 🔮**
-  vagy **Tolvaj 🗡️**. A kasztok szintlépéskor eltérő bónuszokat adnak, és a karakter képe
-  szintenként változik.
+- **Bevezető (onboarding)** – első indításkor lapozható bevezető: mi a HabitQuest, hogyan kapsz
+  XP-t és érmét, a térkép és a zónák, majd kasztválasztás, végül kezdő szokások egy koppintással
+  (víz, séta, olvasás, tanulás, edzés, meditáció) és az értesítési engedély kérése magyarázattal.
+  Csak egyszer jelenik meg; meglévő felhasználóknál nem.
+- **Karakter és kasztok** – kasztot választasz: **Harcos ⚔️**, **Mágus 🔮** vagy **Tolvaj 🗡️**.
+  A kasztok szintlépéskor eltérő bónuszokat adnak, és a karakter képe szintenként változik.
 - **Tamagotchi-statok** – a karakternek **HP**, **Energia** és **Hangulat** értéke van.
   A szokások típusuk szerint mást adnak (pl. a vízivás energiát, a séta hangulatot ad, a tanulás
   viszont fáraszt).
@@ -30,6 +33,14 @@ fejlődik a kinézete, és új világzónákba jut el.
   Erdő (1–5. szint) → Hegység (6–10.) → Város (11.+).
 - **Bolt** – érméből italokat és ételeket vehetsz, amik azonnal visszatöltik a statokat.
 - **Achievementek** – feloldható eredmények a profil oldalon.
+- **Statisztika** – a Profilból nyílik: GitHub-stílusú hőtérkép az elmúlt 3 hónapról (összesítve
+  vagy szokásonként szűrve, a nem esedékes napok jelölve), heti összesítő az előző héthez képest,
+  és szokásonként aktuális / leghosszabb sorozat, sikerességi arány az esedékes napokhoz képest,
+  összes teljesítés. A napi teljesítési előzményt az app kb. 13 hónapig őrzi.
+- **Kezdőképernyő-widgetek** – *Kicsi* (avatar, szint, XP, „ma X/Y kész”) és *Közepes* (a ma
+  esedékes szokások listája, mindegyik mellett teljesítés-gomb; a kész szokás kipipálva). A widgetről
+  teljesítés ugyanazt a jutalmat adja, mint az appban, és a nyitott app is azonnal frissül.
+  Éjfélkor és időzóna-váltáskor a widgetek új napra váltanak.
 - **Vízivás-emlékeztető** – WorkManagerrel 30 percenként értesítés, hogy igyál egy pohár vizet.
   A Profil → Beállítások / Adatok részen ki-/bekapcsolható. (Android 13+ esetén minden
   értesítéshez értesítési engedély kell.)
@@ -56,11 +67,13 @@ fejlődik a kinézete, és új világzónákba jut el.
 
 ```
 app/src/main/java/com/example/habitquest/
-├── MainActivity.java          # navigáció, kasztválasztás, értesítések beállítása
-├── model/                     # Habit, Schedule, UserCharacter, WorldZone, ShopItem, Achievement
+├── MainActivity.java          # navigáció, onboarding-átirányítás, értesítésből nyitott fül
+├── data/HabitRepository       # közös adatréteg: app, widget és workerek ugyanazt használják
+├── model/                     # Habit, Schedule, HabitStats, RewardRules, UserCharacter, WorldZone, …
 ├── viewmodel/MainViewModel    # játéklogika: jutalmak, szintlépés, bolt, zónák
 ├── view/                      # fragmentek (Szokások, Térkép, Bolt, Profil) és adapterek
 ├── notifications/             # WaterWorker, HabitReminderWorker, ReminderScheduler (WorkManager)
+├── widget/                    # kezdőképernyő-widgetek (providerek, RemoteViews, éjféli frissítés)
 └── utils/                     # StorageHelper (mentés, migráció), BackupManager (export/import)
 ```
 
