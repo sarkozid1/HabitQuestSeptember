@@ -41,4 +41,11 @@ public class WorldZone {
             new WorldZone("Mountain", 6, 10, R.drawable.map_background);
     public static final WorldZone CITY =
             new WorldZone("City", 11, 99, R.drawable.map_city);
+
+    /** A szinthez tartozó zóna (99 fölött is a Város). */
+    public static WorldZone forLevel(int level) {
+        if (FOREST.containsLevel(level)) return FOREST;
+        if (MOUNTAIN.containsLevel(level)) return MOUNTAIN;
+        return CITY;
+    }
 }

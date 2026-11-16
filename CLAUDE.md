@@ -25,12 +25,13 @@ app/src/main/java/com/example/habitquest/
 │                         #   workerek mind ezen át olvasnak/írnak; jutalom, streak, achievement, mentés
 ├── model/                # tiszta Java domain + logika (Android-függés nélkül, kivéve R.drawable)
 │                         #   Habit (teljesítés, streak, esedékesség, emlékeztető, napi előzmény),
-│                         #   Schedule, HabitStats (statisztika), RewardRules (jutalom),
+│                         #   Schedule, HabitStats (statisztika), RewardRules (jutalom), LevelUpCelebration,
 │                         #   UserCharacter (XP, szint, statok), WorldZone, ShopItem, Achievement
 ├── viewmodel/            # MainViewModel: a repository tükrözése + származtatott állapot (mai lista,
 │                         #   zóna, statok); StatsSnapshot, OnboardingViewModel, HabitListItem
 ├── view/                 # Fragmentek, OnboardingActivity, adapterek, egyedi View-k (MapPathView,
-│                         #   HeatmapView), HabitFormBinder. CSAK megjelenítés és input továbbítása
+│                         #   HeatmapView, LevelUpRaysView), LevelUpOverlay, IdleFloatAnimator, MapMotion,
+│                         #   HabitFormBinder. CSAK megjelenítés és input továbbítása
 ├── notifications/        # WaterWorker, HabitReminderWorker, NotificationHelper,
 │                         #   ReminderScheduler (interfész; tesztben NO_OP / fake) + WorkManager implementáció
 ├── widget/               # kezdőképernyő-widgetek: providerek, HabitWidgets (RemoteViews), WidgetState
@@ -79,7 +80,11 @@ eredményt ad. Mindig nézd a `BUILD SUCCESSFUL`-t, töröld előtte az
 6. **Óra.** Dátumfüggő logika beinjektálható órával (`java.time.Clock` vagy `LocalDate` paraméter).
 7. **Ellenőrzés.** Minden lépés végén `testDebugUnitTest` + `assembleDebug`. A végén rövid
    összefoglaló és kézi tesztelési lista a telefonra.
-8. **Stílus.** Fantasy / pergamen / arany: színek a `colors.xml`-ben (`ink_*`, `gold_*`, `glass_*`),
+8. **Animáció.** A karakterképek csak merev mozgást kaphatnak (eltolás, méretezés, tükrözés,
+   enyhe billenés) – torzítás, mesh-warp, végtagmozgatás, 3D: elutasítva. Minden animáció tartsa
+   tiszteletben a rendszer „animációk kikapcsolva” beállítását (`ValueAnimator.areAnimatorsEnabled()`),
+   és csak látható nézetnél fusson (rejtett fül: `onHiddenChanged`).
+9. **Stílus.** Fantasy / pergamen / arany: színek a `colors.xml`-ben (`ink_*`, `gold_*`, `glass_*`),
    hátterek a `glass_*` és `*_bg` drawable-ökben (`dialog_scroll_bg`, `input_fantasy_bg`,
    `button_pill_*`). Új UI elem ezekhez illeszkedjen; dialógusok gombjai arany színűek.
 
@@ -91,6 +96,9 @@ eredményt ad. Mindig nézd a `BUILD SUCCESSFUL`-t, töröld előtte az
   `adb shell run-as com.example.habitquest ...`.
 - WorkManager job kényszerített futtatása:
   `adb shell cmd jobscheduler run -f -n androidx.work.systemjobscheduler com.example.habitquest <jobId>`.
+- A végtelen animációk (lebegés, sugarak, ösvény) miatt a `uiautomator dump` „could not get idle
+  state” hibát ad – képernyőképpel (`adb exec-out screencap -p`) vagy a mentett prefs-szel ellenőrizz.
+  Ugyanez érinti a későbbi Espresso teszteket (ott az animációkat ki kell kapcsolni).
 - Napváltás root nélkül: `adb shell settings put global auto_time_zone 0`, majd
   `adb shell cmd alarm set-timezone Pacific/Kiritimati` (UTC+14) / `GMT` – a widgetek frissülnek.
 - „Zárt app” teszthez `adb shell am kill` (csak a folyamat). A `force-stop` a widgetek
@@ -125,7 +133,6 @@ eredményt ad. Mindig nézd a `BUILD SUCCESSFUL`-t, töröld előtte az
   habit-id alapján) kötődnek a szokáshoz.
 - `UserCharacter.applyDecay()` sehonnan nincs hívva (a statok nem romlanak); `HabitFragment.animateBackgroundTransition()` nem használt.
 - A mentés/export a fő szálon fut (kis adatnál elfogadható).
-- Navigációkor minden fül új Fragment-példányt kap (`replace`), az állapot nem marad meg.
 
 **Kiadás**
 - `applicationId = "com.example.habitquest"` – a Play Store `com.example` csomagnevet nem fogad el.

@@ -40,6 +40,7 @@ import java.time.LocalDate;
 public class ProfileFragment extends Fragment {
 
     private MainViewModel viewModel;
+    private IdleFloatAnimator idleFloat;
 
     // Storage Access Framework: a felhasználó választja ki a helyet → nem kell tárhely-engedély
     private final ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
@@ -106,6 +107,10 @@ public class ProfileFragment extends Fragment {
 
         UIHelper.bindBackgroundToZone(this, viewModel);
 
+        // az avatar finoman lebeg a keretében (csak látható képernyőn)
+        idleFloat = IdleFloatAnimator.attach(getViewLifecycleOwner(),
+                avatar, view.findViewById(R.id.avatarShadow), 5f);
+
         // ⚙️ Beállítások: vízivás-emlékeztető kapcsoló
         MaterialSwitch waterSwitch = view.findViewById(R.id.waterReminderSwitch);
         viewModel.getWaterReminderEnabled().observe(getViewLifecycleOwner(), enabled -> {
@@ -122,10 +127,15 @@ public class ProfileFragment extends Fragment {
         });
 
         // 📊 Statisztika (vissza gombbal a Profilra tér vissza)
+        // (add + hide: a többi, rejtett fül megmarad; a vissza gomb visszahozza a Profilt)
         view.findViewById(R.id.openStatsButton).setOnClickListener(v ->
-                requireActivity().getSupportFragmentManager()
+                getParentFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.mainFragmentContainer, new StatsFragment())
+                        .setReorderingAllowed(true)
+                        .setCustomAnimations(R.anim.tab_in_from_right, R.anim.tab_out_to_left,
+                                R.anim.tab_in_from_left, R.anim.tab_out_to_right)
+                        .hide(this)
+                        .add(R.id.mainFragmentContainer, new StatsFragment(), "stats")
                         .addToBackStack("stats")
                         .commit());
 
@@ -250,7 +260,13 @@ public class ProfileFragment extends Fragment {
         if (negative != null) negative.setTextColor(color);
     }
 
-    private void animateCounter(TextView tv, int from, int to, int durationMs, boolean showMax, int max) {
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (idleFloat != null) idleFloat.setActive(!hidden); // rejtett fülön nem animál
+    }
+
+        private void animateCounter(TextView tv, int from, int to, int durationMs, boolean showMax, int max) {
         ValueAnimator a = ValueAnimator.ofInt(from, to);
         a.setDuration(durationMs);
         a.addUpdateListener(v -> {

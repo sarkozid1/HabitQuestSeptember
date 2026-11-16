@@ -29,8 +29,16 @@ fejlődik a kinézete, és új világzónákba jut el.
   viszont fáraszt).
 - **Szintek és XP** – a következő szinthez `szint × 100` XP kell. Szintlépéskor a statok
   feltöltődnek, a maximumok nőnek, és érmét kapsz.
+- **Szintlépés-ünneplés** – teljes képernyős pergamen-kártya forgó arany fénysugarakkal: az új
+  szint, a jutalmak és – zónahatárnál – az új terület. A widgetről vagy zárt appnál történt
+  szintlépést is megünnepli a következő megnyitáskor; a „Tovább” után nem jön vissza.
+- **Élő avatar** – a hős a Szokások és a Profil képernyőn finoman lebeg, alatta árnyék.
 - **Világtérkép** – a szinted alapján haladsz a zónák között:
-  Erdő (1–5. szint) → Hegység (6–10.) → Város (11.+).
+  Erdő (1–5. szint) → Hegység (6–10.) → Város (11.+). Szintlépés után a hős lépésenként,
+  kis ugrásokkal elsétál a következő állomásra, és a haladás irányába fordul; az arany ösvény a cél
+  felé „folyik”, az aktuális állomás pulzál.
+- **Gördülékeny navigáció** – a fülek rövid áttűnéssel váltanak, és megőrzik az állapotukat
+  (görgetés, megnyitott térkép). Kikapcsolt rendszeranimációknál az app sem animál.
 - **Bolt** – érméből italokat és ételeket vehetsz, amik azonnal visszatöltik a statokat.
 - **Achievementek** – feloldható eredmények a profil oldalon.
 - **Statisztika** – a Profilból nyílik: GitHub-stílusú hőtérkép az elmúlt 3 hónapról (összesítve

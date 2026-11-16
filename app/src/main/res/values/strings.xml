@@ -183,6 +183,23 @@
     <string name="starter_meditate_name">Meditáció 10 perc</string>
     <string name="starter_meditate_desc">Csendes pihenés a napodban</string>
 
+    <!-- Zónák -->
+    <string name="zone_forest">Erdő</string>
+    <string name="zone_mountain">Hegység</string>
+    <string name="zone_city">Város</string>
+
+    <!-- Térkép -->
+    <string name="map_zone_range">%1$d–%2$d. szint</string>
+    <string name="map_progress">🚩 %1$d / %2$d</string>
+
+    <!-- Szintlépés -->
+    <string name="level_up_title">✨ Szintlépés! ✨</string>
+    <string name="level_up_level">%1$d. szint</string>
+    <string name="level_up_rewards">❤️ HP és ⚡ energia feltöltve\n📈 Max HP és energia +%1$d\n💰 +%2$d érme</string>
+    <string name="level_up_zone">🗺️ Új terület: %1$s!</string>
+    <string name="level_up_continue">Tovább</string>
+    <string name="level_up_announcement">Szintlépés! Elérted a(z) %1$d. szintet.</string>
+
     <!-- Szokás képernyő fejléc -->
     <string name="habit_header_stats">Szint: %1$d | XP: %2$d</string>
     <string name="level_title_novice">Tanonc</string>

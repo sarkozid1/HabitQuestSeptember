@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.habitquest.model.Achievement;
 import com.example.habitquest.model.Habit;
+import com.example.habitquest.model.LevelUpCelebration;
 import com.example.habitquest.model.RewardRules;
 import com.example.habitquest.model.Schedule;
 import com.example.habitquest.model.ShopItem;
@@ -91,11 +92,16 @@ public class HabitRepository {
     private boolean waterReminderEnabled = true;
     /** Memóriában élő (teszt) példánynál nincs onboarding. */
     private boolean onboardingDone = true;
+    /** Az utoljára megünnepelt szint és az azóta (szintlépésekkel) szerzett érme. */
+    private int celebratedLevel = 1;
+    private int pendingLevelCoins = 0;
 
     private final MutableLiveData<UserCharacter> characterLive = new MutableLiveData<>(character);
     private final MutableLiveData<List<Habit>> habitsLive = new MutableLiveData<>(habits);
     private final MutableLiveData<List<Achievement>> achievementsLive = new MutableLiveData<>(achievements);
     private final MutableLiveData<Boolean> waterLive = new MutableLiveData<>(true);
+    /** A még nem nyugtázott szintlépés-ünneplés (null = nincs). */
+    private final MutableLiveData<LevelUpCelebration> celebrationLive = new MutableLiveData<>(null);
 
     public HabitRepository(@Nullable StorageHelper storage, @Nullable ReminderScheduler scheduler,
                            @Nullable Clock clock, @Nullable ChangeListener listener) {
@@ -137,6 +143,7 @@ public class HabitRepository {
     public LiveData<List<Habit>> getHabits() { return habitsLive; }
     public LiveData<List<Achievement>> getAchievements() { return achievementsLive; }
     public LiveData<Boolean> getWaterReminderEnabled() { return waterLive; }
+    public LiveData<LevelUpCelebration> getPendingCelebration() { return celebrationLive; }
 
     public synchronized UserCharacter getCharacterSnapshot() { return character; }
 
@@ -188,6 +195,16 @@ public class HabitRepository {
         }
 
         waterReminderEnabled = storage.isWaterReminderEnabled();
+
+        // Ünneplés-állapot. Régi mentésnél (nincs mentett érték) a jelenlegi szint számít
+        // megünnepeltnek → a korábbi szintlépésekre nem jön utólagos ünneplés.
+        celebratedLevel = storage.getCelebratedLevel();
+        pendingLevelCoins = storage.getPendingLevelCoins();
+        if (celebratedLevel < 1 || celebratedLevel > character.getLevel()) {
+            celebratedLevel = character.getLevel();
+            pendingLevelCoins = 0;
+            saveCelebration();
+        }
         publishAll();
         Log.d(TAG, "Betöltve: " + habits.size() + " szokás, szint " + character.getLevel());
     }
@@ -214,9 +231,13 @@ public class HabitRepository {
         habit.complete(today());
 
         int prevLevel = character.getLevel();
+        int coinsBefore = character.getCoins();
         RewardRules.apply(character, habit);
         if (character.getLevel() > prevLevel) {
             Log.d(TAG, "Szintlépés! Új szint: " + character.getLevel());
+            // a szintlépő teljesítés érméi (a szintlépési bónusszal együtt) az ünneplésbe
+            pendingLevelCoins += Math.max(0, character.getCoins() - coinsBefore);
+            saveCelebration();
         }
 
         boolean achievementsChanged = false;
@@ -337,10 +358,15 @@ public class HabitRepository {
         applyCharacterClass(characterClass);
         saveCharacter();
         publish(characterLive, character);
+        publish(celebrationLive, currentCelebration());
         notifyChanged();
     }
 
     private void applyCharacterClass(String characterClass) {
+        // kasztválasztáskor 1. szintről indul – nincs mit ünnepelni
+        celebratedLevel = 1;
+        pendingLevelCoins = 0;
+        saveCelebration();
         character.setCharacterClass(characterClass);
         character.setLevel(1);
         character.setExperience(0);
@@ -367,6 +393,28 @@ public class HabitRepository {
         saveCharacter();
         publish(characterLive, character);
         notifyChanged();
+    }
+
+    // -------------------------
+    // Szintlépés-ünneplés
+    // -------------------------
+
+    /** A még nem nyugtázott ünneplés, vagy null. */
+    @Nullable
+    public synchronized LevelUpCelebration currentCelebration() {
+        return LevelUpCelebration.pending(celebratedLevel, character.getLevel(), pendingLevelCoins);
+    }
+
+    /** A felhasználó látta az ünneplést ("Tovább") – nem jön vissza (forgatáskor sem). */
+    public synchronized void acknowledgeCelebration() {
+        celebratedLevel = character.getLevel();
+        pendingLevelCoins = 0;
+        saveCelebration();
+        publish(celebrationLive, null);
+    }
+
+    private void saveCelebration() {
+        if (storage != null) storage.saveCelebrationState(celebratedLevel, pendingLevelCoins);
     }
 
     // -------------------------
@@ -425,6 +473,10 @@ public class HabitRepository {
         if (data == null || data.getCharacter() == null || data.getHabits() == null) return;
 
         character = data.getCharacter();
+        // importált haladásra nincs utólagos ünneplés
+        celebratedLevel = character.getLevel();
+        pendingLevelCoins = 0;
+        saveCelebration();
         habits = new ArrayList<>(data.getHabits());
         achievements = new ArrayList<>(data.getAchievements());
 
@@ -453,6 +505,7 @@ public class HabitRepository {
     private void saveAchievements() { if (storage != null) storage.saveAchievements(achievements); }
 
     private void publishAll() {
+        publish(celebrationLive, currentCelebration());
         publish(characterLive, character);
         publish(habitsLive, habits);
         publish(achievementsLive, achievements);

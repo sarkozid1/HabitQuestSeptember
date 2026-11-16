@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lágy ovális árnyék a lebegő avatar alatt -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:centerColor="#55000000"
+        android:endColor="#00000000"
+        android:gradientRadius="30dp"
+        android:startColor="#99000000"
+        android:type="radial" />
+</shape>

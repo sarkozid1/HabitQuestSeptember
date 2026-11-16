@@ -22,16 +22,31 @@
             android:background="@drawable/glass_card_bg"
             android:padding="20dp">
 
-            <ImageView
-                android:id="@+id/avatarImage"
+            <!-- Keret: a kép benne lebeg, alatta árnyék -->
+            <FrameLayout
                 android:layout_width="180dp"
                 android:layout_height="240dp"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/glass_avatar_frame_bg"
-                android:contentDescription="Avatar"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/lv1" />
+                android:padding="10dp">
+
+                <View
+                    android:id="@+id/avatarShadow"
+                    android:layout_width="96dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:alpha="0.35"
+                    android:background="@drawable/avatar_shadow" />
+
+                <ImageView
+                    android:id="@+id/avatarImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:contentDescription="@string/karakter_ikon"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/lv1" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/usernameText"

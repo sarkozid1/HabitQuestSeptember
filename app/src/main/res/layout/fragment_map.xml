@@ -12,6 +12,14 @@
         android:layout_height="match_parent"
         android:layout_marginTop="80dp" />
 
+    <!-- A hős árnyéka a talajon (ugráskor kisebb) -->
+    <View
+        android:id="@+id/characterShadowMap"
+        android:layout_width="40dp"
+        android:layout_height="9dp"
+        android:alpha="0.35"
+        android:background="@drawable/avatar_shadow" />
+
     <!-- Karakter ikon (az ösvény mentén mozog) -->
     <ImageView
         android:id="@+id/characterIcon"
@@ -43,7 +51,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="serif"
-                android:text="Vidék"
                 android:textColor="@color/ink_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -53,7 +60,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Szint 1–5"
                 android:textColor="@color/ink_secondary"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -63,7 +69,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/glass_chip_bg"
-            android:text="🚩 1 / 5"
             android:textColor="@color/ink_primary"
             android:textSize="15sp"
             android:textStyle="bold" />

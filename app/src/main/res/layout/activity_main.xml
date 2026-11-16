@@ -48,5 +48,8 @@
         app:elevation="10dp"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
+
+    <!-- ✨ Szintlépés-ünneplés (minden felett) -->
+    <include layout="@layout/view_level_up_overlay" />
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

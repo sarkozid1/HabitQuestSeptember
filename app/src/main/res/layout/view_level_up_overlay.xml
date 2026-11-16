@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Szintlépés-ünneplés: teljes képernyős réteg a MainActivity fölött (LevelUpOverlay vezérli) -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/levelUpOverlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#B3140E06"
+    android:clickable="true"
+    android:elevation="30dp"
+    android:focusable="true"
+    android:visibility="gone">
+
+    <com.example.habitquest.view.LevelUpRaysView
+        android:id="@+id/levelUpRays"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:id="@+id/levelUpCard"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/dialog_scroll_bg"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <TextView
+            android:id="@+id/levelUpTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="@string/level_up_title"
+            android:textColor="#4A2F17"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/levelUpAvatar"
+            android:layout_width="140dp"
+            android:layout_height="160dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/karakter_ikon"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:id="@+id/levelUpLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/glass_chip_bg"
+            android:fontFamily="serif"
+            android:textColor="@color/ink_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="10dp"
+            android:background="#8B5A2B" />
+
+        <TextView
+            android:id="@+id/levelUpRewards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lineSpacingExtra="4sp"
+            android:textColor="#3A2C1A"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/levelUpZone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/glass_chip_bg"
+            android:gravity="center"
+            android:textColor="@color/ink_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/levelUpContinue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/button_pill_oncard"
+            android:backgroundTint="@null"
+            android:stateListAnimator="@null"
+            android:text="@string/level_up_continue"
+            android:textAllCaps="false"
+            android:textColor="@color/ink_primary"
+            android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>

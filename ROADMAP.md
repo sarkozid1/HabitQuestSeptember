@@ -48,22 +48,26 @@ nincsenek tárolva).
 
 ---
 
-## [ ] 3. fázis – Élő avatar és térkép
+## [x] 3. fázis – Élő avatar és térkép
 
-Cél: a karakter és a térkép „éljen”, a szintlépés esemény legyen.
+A `feature/phase3-elo-avatar` ágon (a 2. fázis ágára épül), 200 unit teszt zöld, emulátoron
+végigpróbálva. **Még nincs commitolva / merge-ölve.** A karakterképek csak merev mozgást kapnak
+(eltolás, méretezés, tükrözés, billenés) – a rajz nem torzul.
 
-- [ ] **Egyszeri UI-esemény a ViewModelből** – `SingleLiveEvent` / esemény-burkoló (`Event<T>`) a szintlépésre és az új zóna felfedezésére (a mostani `lastDiscoveredZone` kézi nullázás helyett).
-  **Függ:** – (a többi animáció erre épül).
-- [ ] **Szintlépés-animáció** – overlay a pergamen/arany stílusban (felvillanás, szint szám, jutalmak), a fenti eseményre indul, forgatáskor nem ismétlődik.
-  **Függ:** egyszeri UI-esemény.
-- [ ] **Avatar idle animáció** – lebegés + árnyék a Szokások és a Profil képernyőn (`ObjectAnimator`, életciklushoz kötve, `onDestroyView`-ban leállítva).
-  **Függ:** –
-- [ ] **Térkép: irány szerinti tükrözés + lépés-ugrálás** – a `MapFragment.walkAlongTrail` bővítése (`scaleX` az irány szerint, kis függőleges ugrálás járás közben).
-  **Függ:** –
-- [ ] **Folyó ösvény és pulzáló checkpoint** – a `MapPathView`-ban animált `DashPathEffect` fázis és az aktuális checkpoint pulzálása (`invalidate` csak animáció alatt).
-  **Függ:** –
-- [ ] **Fragmentváltás animáció** – `setCustomAnimations` a `MainActivity.loadFragment`-ben, és az állapot megőrzése (show/hide a `replace` helyett).
-  **Függ:** –
+- [x] **Szintlépés mint állapot** – `LevelUpCelebration` + mentett „utoljára megünnepelt szint”
+  (`celebrated_level`, `pending_level_coins`): nyugtázásig függő, újraindítást/forgatást túlél,
+  több szintet összesít, a widgetes szintlépést is megünnepli. Régi mentésnél / importnál nincs
+  utólagos ünneplés. (A tervezett egyszeri `Event<T>` helyett – így robusztusabb.)
+- [x] **Szintlépés-animáció** – `LevelUpOverlay` + `LevelUpRaysView` (forgó sugarak, szikrák),
+  új zóna jelzése; a térkép régi „Új terület” ablaka és a memóriabeli `lastDiscoveredZone` megszűnt.
+- [x] **Avatar idle animáció** – `IdleFloatAnimator` (lebegés + árnyék), életciklushoz és a fül
+  láthatóságához kötve.
+- [x] **Térkép: tükrözés + lépés-ugrálás** – `MapMotion` (tesztelt görbék), billegés, talajon
+  maradó árnyék, leérkezés; a zónanevek és a térkép szövegei magyarul a `strings.xml`-ből.
+- [x] **Folyó ösvény és pulzáló checkpoint** – egy animátor, csak látható nézetnél
+  (`onVisibilityAggregated`).
+- [x] **Fragmentváltás animáció** – irány szerinti csúszás + áttűnés; a fülek show/hide-dal
+  váltanak (állapot megmarad), a statisztika add+hide-dal nyílik; forgatás után a fül megmarad.
 
 ---
 
@@ -78,7 +82,7 @@ Cél: motiváló, de kíméletes játékmenet, ami a saját szokásokra épül.
 - [ ] **Napi küldetések a saját szokásokból** – naponta 1–3 véletlen kihívás a ma esedékes szokásokból (pl. „teljesíts 2 szokást dél előtt”), extra XP/coin.
   **Függ:** 1. fázis (`isDueOn`, habit id), 2. fázis (teljesítési napló az időpontokhoz).
 - [ ] **Zóna-boss** – minden zóna végén boss, akinek a HP-ját a teljesítések sebzik; legyőzése nyitja a következő zónát.
-  **Függ:** 3. fázis (szintlépés/zóna esemény, animációk), `WorldZone`.
+  **Függ:** 3. fázis (`LevelUpCelebration` / zónaváltás, animációk), `WorldZone.forLevel`.
 - [ ] **Rövid zónatörténet** – zónánként 2–3 pergamen-szöveg (felfedezéskor, boss előtt és után), `strings.xml`-ben.
   **Függ:** zóna-boss, 3. fázis eseményrendszere.
 - [ ] **Achievementek rendbetétele** – a `targetCount` / linkelt achievementek tényleges ellenőrzése, név helyett habit-id alapú kötés, migrációval.

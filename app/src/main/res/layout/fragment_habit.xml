@@ -21,13 +21,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Avatar -->
-        <ImageView
-            android:id="@+id/characterImage"
+        <!-- Avatar (lebeg) + árnyék -->
+        <FrameLayout
             android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:contentDescription="Karakter kép"
-            android:src="@drawable/lv1" />
+            android:layout_height="106dp">
+
+            <View
+                android:id="@+id/characterShadow"
+                android:layout_width="56dp"
+                android:layout_height="10dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:alpha="0.35"
+                android:background="@drawable/avatar_shadow" />
+
+            <ImageView
+                android:id="@+id/characterImage"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:contentDescription="@string/karakter_ikon"
+                android:src="@drawable/lv1" />
+        </FrameLayout>
 
         <!-- Szint neve -->
         <TextView

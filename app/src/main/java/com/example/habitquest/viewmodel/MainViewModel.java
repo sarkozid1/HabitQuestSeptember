@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.habitquest.data.HabitRepository;
 import com.example.habitquest.model.Achievement;
 import com.example.habitquest.model.Habit;
+import com.example.habitquest.model.LevelUpCelebration;
 import com.example.habitquest.model.Schedule;
 import com.example.habitquest.model.ShopItem;
 import com.example.habitquest.model.UserCharacter;
@@ -51,7 +52,8 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<Boolean> waterReminderEnabled = new MutableLiveData<>(true);
     private final MutableLiveData<WorldZone> currentZone = new MutableLiveData<>();
     private final MutableLiveData<List<ShopItem>> shopItems = new MutableLiveData<>(buildShopCatalog());
-    private final MutableLiveData<String> lastDiscoveredZone = new MutableLiveData<>(null);
+    /** Még nem nyugtázott szintlépés-ünneplés (null = nincs). */
+    private final MutableLiveData<LevelUpCelebration> pendingCelebration = new MutableLiveData<>(null);
 
     private final MutableLiveData<Integer> hp = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> energy = new MutableLiveData<>(0);
@@ -63,6 +65,7 @@ public class MainViewModel extends ViewModel {
     private final Observer<List<Habit>> habitsObserver = this::onHabitsChanged;
     private final Observer<List<Achievement>> achievementsObserver = achievements::setValue;
     private final Observer<Boolean> waterObserver = waterReminderEnabled::setValue;
+    private final Observer<LevelUpCelebration> celebrationObserver = pendingCelebration::setValue;
 
     public MainViewModel() {
         attach(repository);
@@ -82,10 +85,14 @@ public class MainViewModel extends ViewModel {
     public LiveData<List<Achievement>> getAchievements() { return achievements; }
     public LiveData<WorldZone> getCurrentZone() { return currentZone; }
     public LiveData<List<ShopItem>> getShopItems() { return shopItems; }
-    public LiveData<String> getLastDiscoveredZone() { return lastDiscoveredZone; }
     public LiveData<Boolean> getWaterReminderEnabled() { return waterReminderEnabled; }
+    public LiveData<LevelUpCelebration> getPendingCelebration() { return pendingCelebration; }
 
-    public void setLastDiscoveredZone(String zoneName) { lastDiscoveredZone.setValue(zoneName); }
+    /** A szintlépés-ünneplés nyugtázása ("Tovább"): elmentve, nem jön vissza. */
+    public void acknowledgeCelebration() {
+        repository.acknowledgeCelebration();
+    }
+
     public boolean isStorageInitialized() { return storageInitialized; }
 
     /** A közös adatréteg (pl. statisztika képernyőhöz). */
@@ -120,6 +127,7 @@ public class MainViewModel extends ViewModel {
         repo.getHabits().observeForever(habitsObserver);
         repo.getAchievements().observeForever(achievementsObserver);
         repo.getWaterReminderEnabled().observeForever(waterObserver);
+        repo.getPendingCelebration().observeForever(celebrationObserver);
     }
 
     private void detach(HabitRepository repo) {
@@ -127,6 +135,7 @@ public class MainViewModel extends ViewModel {
         repo.getHabits().removeObserver(habitsObserver);
         repo.getAchievements().removeObserver(achievementsObserver);
         repo.getWaterReminderEnabled().removeObserver(waterObserver);
+        repo.getPendingCelebration().removeObserver(celebrationObserver);
     }
 
     @Override

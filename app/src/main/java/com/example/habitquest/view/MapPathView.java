@@ -7,14 +7,20 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.animation.ValueAnimator;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.Nullable;
 
 /**
   Kanyargó ösvény a zóna checkpointjaival, a habit kártyák pergamen/arany stílusában.
   A checkpointok a nézet méretéhez igazodva, arányosan kerülnek kiszámításra.
+
+  Élő hatások (egyetlen animátorral, csak amíg a nézet látható, és ha a rendszerben
+  engedélyezettek az animációk): az arany szaggatott vonal a cél felé "folyik",
+  az aktuális állomás gyűrűje pulzál.
  */
 public class MapPathView extends View {
 
@@ -36,6 +42,16 @@ public class MapPathView extends View {
 
     private int nodeCount = 5;
     private int startLevel = 1;
+
+    // élő hatások
+    /** Egy pulzálás ideje (ms); a folyás ugyanebből a fázisból számol. */
+    private static final long AMBIENT_CYCLE_MS = 1600;
+    private ValueAnimator ambientAnimator;
+    /** 0..1 – a szaggatás eltolása egy mintahosszon belül. */
+    private float flowPhase = 0f;
+    /** 0..1 – a pulzálás erőssége. */
+    private float pulse = 0f;
+    private float dashOn = 0f, dashOff = 0f;
 
     /** Az állomások vízszintes helye a szélesség arányában – váltakozó, de nem szimmetrikus. */
     private static final float[] X_FRACTIONS = {0.30f, 0.68f, 0.38f, 0.72f, 0.34f, 0.64f};
@@ -94,6 +110,45 @@ public class MapPathView extends View {
         return total * clamped / (checkpoints.length - 1);
     }
 
+    // -------------------------
+    // Élő hatások: csak látható nézetnél fut
+    // -------------------------
+    @Override
+    public void onVisibilityAggregated(boolean isVisible) {
+        super.onVisibilityAggregated(isVisible);
+        if (isVisible) startAmbient();
+        else stopAmbient();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        stopAmbient();
+        super.onDetachedFromWindow();
+    }
+
+    private void startAmbient() {
+        if (ambientAnimator != null || !ValueAnimator.areAnimatorsEnabled()) return;
+        ambientAnimator = ValueAnimator.ofFloat(0f, 1f);
+        ambientAnimator.setDuration(AMBIENT_CYCLE_MS);
+        ambientAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        ambientAnimator.setInterpolator(new LinearInterpolator());
+        ambientAnimator.addUpdateListener(a -> {
+            float t = (float) a.getAnimatedValue();
+            flowPhase = t;
+            pulse = (float) (0.5 - 0.5 * Math.cos(t * 2 * Math.PI)); // 0 → 1 → 0
+            invalidate();
+        });
+        ambientAnimator.start();
+    }
+
+    private void stopAmbient() {
+        if (ambientAnimator == null) return;
+        ambientAnimator.cancel();
+        ambientAnimator = null;
+        pulse = 0f;
+        invalidate();
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -124,8 +179,9 @@ public class MapPathView extends View {
         float radius = nodeRadius();
         trailBasePaint.setStrokeWidth(radius * 0.5f);
         trailDashPaint.setStrokeWidth(radius * 0.22f);
-        trailDashPaint.setPathEffect(new DashPathEffect(
-                new float[]{radius * 0.35f, radius * 0.45f}, 0));
+        dashOn = radius * 0.35f;
+        dashOff = radius * 0.45f;
+        trailDashPaint.setPathEffect(new DashPathEffect(new float[]{dashOn, dashOff}, 0));
         labelPaint.setTextSize(radius * 0.85f);
     }
 
@@ -178,7 +234,11 @@ public class MapPathView extends View {
         super.onDraw(canvas);
         if (checkpoints.length == 0) return;
 
-        // 1) ÖSVÉNY
+        // 1) ÖSVÉNY (a szaggatás az út vége – a következő állomás – felé halad)
+        if (ambientAnimator != null && dashOn > 0) {
+            trailDashPaint.setPathEffect(new DashPathEffect(new float[]{dashOn, dashOff},
+                    -flowPhase * (dashOn + dashOff)));
+        }
         canvas.drawPath(trailPath, trailBasePaint);
         canvas.drawPath(trailPath, trailDashPaint);
 
@@ -204,7 +264,10 @@ public class MapPathView extends View {
                 nodeStrokePaint.setPathEffect(null);
                 nodeStrokePaint.setColor(GOLD);
                 nodeStrokePaint.setStrokeWidth(radius * 0.1f);
-                canvas.drawCircle(cx, cy, radius * 1.35f, nodeStrokePaint);
+                // pulzáló gyűrű: kitágul és halványul
+                nodeStrokePaint.setAlpha((int) (255 * (1f - 0.55f * pulse)));
+                canvas.drawCircle(cx, cy, radius * (1.35f + 0.25f * pulse), nodeStrokePaint);
+                nodeStrokePaint.setAlpha(255);
             }
 
             labelPaint.setColor(reached ? INK : 0x993A2C1A);

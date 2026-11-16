@@ -43,6 +43,7 @@ public class HabitFragment extends Fragment {
     private ProgressBar xpBar;
     private RecyclerView recyclerView;
     private Button addHabitButton;
+    private IdleFloatAnimator idleFloat;
 
     /** Értesítési engedély kérése az első emlékeztető bekapcsolásakor (Android 13+). */
     private final androidx.activity.result.ActivityResultLauncher<String> notificationPermission =
@@ -110,6 +111,18 @@ public class HabitFragment extends Fragment {
         addHabitButton.setOnClickListener(v -> showAddHabitDialog());
 
         UIHelper.bindBackgroundToZone(this, viewModel);
+
+        // az avatar finoman lebeg (csak látható képernyőn)
+        idleFloat = IdleFloatAnimator.attach(getViewLifecycleOwner(),
+                characterImage, view.findViewById(R.id.characterShadow), 4f);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (idleFloat != null) idleFloat.setActive(!hidden); // rejtett fülön nem animál
+        // fülre visszatérve (show/hide-nál nincs onResume) a mai állapot újraszámolása
+        if (!hidden && viewModel != null) viewModel.refreshHabitItems();
     }
 
     @Override

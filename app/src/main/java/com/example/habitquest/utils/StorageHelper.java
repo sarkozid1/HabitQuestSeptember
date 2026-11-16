@@ -30,6 +30,8 @@ public class StorageHelper {
     private static final String KEY_ACHIEVEMENTS = "achievements_data";
     private static final String KEY_WATER_REMINDER = "water_reminder_enabled";
     private static final String KEY_ONBOARDING_DONE = "onboarding_done";
+    private static final String KEY_CELEBRATED_LEVEL = "celebrated_level";
+    private static final String KEY_PENDING_LEVEL_COINS = "pending_level_coins";
 
     private final SharedPreferences prefs;
     private final Gson gson;
@@ -228,6 +230,23 @@ public class StorageHelper {
 
     public void setOnboardingDone(boolean done) {
         prefs.edit().putBoolean(KEY_ONBOARDING_DONE, done).apply();
+    }
+
+    /** Az utoljára megünnepelt szint; 0, ha még nincs mentve (régi mentés). */
+    public int getCelebratedLevel() {
+        return prefs.getInt(KEY_CELEBRATED_LEVEL, 0);
+    }
+
+    /** A még nem nyugtázott szintlépés(ek) óta szerzett érme. */
+    public int getPendingLevelCoins() {
+        return prefs.getInt(KEY_PENDING_LEVEL_COINS, 0);
+    }
+
+    public void saveCelebrationState(int celebratedLevel, int pendingCoins) {
+        prefs.edit()
+                .putInt(KEY_CELEBRATED_LEVEL, celebratedLevel)
+                .putInt(KEY_PENDING_LEVEL_COINS, pendingCoins)
+                .apply();
     }
 
     /** Van-e már mentett karakter vagy szokáslista (= meglévő felhasználó). */
